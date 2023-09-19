@@ -21,11 +21,13 @@ export default defineConfig({
   build: {
     outDir,
     emptyOutDir: true,
+    minify: false,
     rollupOptions: {
       input: {
         background: resolve(root, 'background', 'index.ts'),
         content: resolve(root, 'content', 'index.ts'),
-        popup: resolve(root, 'popup', 'index.html')
+        popup: resolve(root, 'popup', 'index.html'),
+        components: resolve(root, 'popup', 'components', 'capture.ts')
       },
       output: {
         entryFileNames: (chunk) => `src/${chunk.name}/index.js`

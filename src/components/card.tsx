@@ -3,7 +3,7 @@ type Props = {
   content: {
     index: string
     timeStamp: string
-    description: string
+    desc: string
     attachments?: unknown
   }[]
   url: string
@@ -20,7 +20,7 @@ export default function Card({ title, content, url }: Props) {
         {content.map((value, key) => (
           <div className='bookmark' key={key}>
             <textarea className='text-slate-500 dark:text' name='description' cols={50} rows={4}>
-              {value.description}
+              {value.desc}
             </textarea>
           </div>
         ))}

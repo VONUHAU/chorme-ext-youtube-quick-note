@@ -13,7 +13,7 @@ const manifest: Manifest.WebExtensionManifest = {
   content_scripts: [
     {
       js: ['src/content/index.js'],
-      matches: ['https://*.youtube.com/*']
+      matches: ['https://www.youtube.com/*']
     }
   ],
   action: {
