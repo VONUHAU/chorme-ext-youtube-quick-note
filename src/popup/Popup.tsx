@@ -24,11 +24,9 @@ function App() {
 
   const handleCapture = async () => {
     const tab = await getCurrentTab()
-
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      function: handleScreenShot,
-    })
+    console.log(tab.id)
+    const response = await chrome.tabs.sendMessage(tab.id!, { tab: JSON.stringify(tab) })
+    console.log(response)
   }
 
   return (
