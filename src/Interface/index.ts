@@ -1,13 +1,14 @@
 export type Item = {
-  tabID: string
+  tabID: number
+  vid: string
   title?: string
   notes: [
     {
       desc?: string
       timeStamp: string
-      attachment?: string[]
+      attachment?: string
     }
   ]
   url?: string
-  createdAt: Date
+  createdAt?: string
 }

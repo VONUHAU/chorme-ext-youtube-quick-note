@@ -1,30 +1,32 @@
 import { useState, useEffect } from 'react'
 import Card from '../components/card.tsx'
-import { Item } from '../Interface/index.ts'
+import { getCurrentTab, fetchBookmarks } from '../../utils'
 import './index.css'
+import { Item } from '../Interface/index.ts'
 
 function App() {
-  const [isCapture, setCapture] = useState(false)
-  const [bookmark, setBookmark] = useState<Item>()
-  const [data, setData] = useState<Item[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [data, setData] = useState<any>([])
   // handle load data from chrome storage
   useEffect(() => {
-    chrome.storage.sync.get(['Ydata'], (data) => {
-      const videoNote = data['Ydata'] ? JSON.parse(data['Ydata']) : []
-      setData(videoNote)
-      console.log(data)
-    })
+    const initData = async () => {
+      let bookmarks = await fetchBookmarks()
+      bookmarks = Object.values(bookmarks)
+      console.log(bookmarks)
+      bookmarks = bookmarks.sort((a: Item, b: Item) => new Date(b.createdAt) - new Date(a.createdAt))
+      setData(bookmarks)
+    }
+    initData()
   }, [])
 
-  async function getCurrentTab() {
-    const queryOptions = { active: true, currentWindow: true }
-    const [tab] = await chrome.tabs.query(queryOptions)
-    return tab
+  const handleClearStorageData = () => {
+    chrome.storage.local.clear(() => {
+      console.log('cleared all')
+    })
   }
 
   const handleCapture = async () => {
     const tab = await getCurrentTab()
-    console.log(tab.id)
     const response = await chrome.tabs.sendMessage(tab.id!, { tab: JSON.stringify(tab) })
     console.log(response)
   }
@@ -40,25 +42,19 @@ function App() {
             {' '}
             Capture{' '}
           </button>
-          <button className='bg-slate-700 dark:bg-primary text-white rounded cursor-pointer'> Remove All</button>
+          <button
+            onClick={handleClearStorageData}
+            className='bg-slate-700 dark:bg-primary text-white rounded cursor-pointer'
+          >
+            {' '}
+            Remove All
+          </button>
         </div>
       </section>
       <section className='space-y-3'>
-        <Card
-          title='100+ Web Development Things you Should Know'
-          content={[{ index: '01234', timeStamp: 'timeStamp', desc: 'hello description' }]}
-          url='https://www.youtube.com/watch?v=erEgovG9WBs'
-        />
-        <Card
-          title='100+ Web Development Things you Should Know'
-          content={[{ index: '01234', timeStamp: 'timeStamp', desc: 'hello description' }]}
-          url='https://www.youtube.com/watch?v=erEgovG9WBs'
-        />
-        <Card
-          title='100+ Web Development Things you Should Know'
-          content={[{ index: '01234', timeStamp: 'timeStamp', desc: 'hello description' }]}
-          url='https://www.youtube.com/watch?v=erEgovG9WBs'
-        />
+        {data.map((value: Item, key: number) => (
+          <Card key={key} {...value} />
+        ))}
       </section>
     </div>
   )

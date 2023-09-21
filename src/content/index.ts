@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Item } from '../Interface'
 
@@ -16,31 +17,14 @@ function getTime(t) {
   return date.toISOString().substr(11, 8)
 }
 
-const handleOnSave = (item: Item) => {
-  if (!item) return
-  const newData = [...data]
-  let isNewData = false
-  for (const i in newData) {
-    if (newData[i].tabID == item.tabID) {
-      newData[i] = { ...newData[i], ...item }
-      isNewData = false
-      break
-    }
-  }
-  !isNewData && newData.unshift(item)
-  chrome.storage.sync.set({ 'y-data': JSON.stringify(newData) }).then(() => {
-    console.log('Save successfully!')
-  })
-}
-
-async function handleScreenShot(tab: unknown) {
+async function handleScreenShot(tab) {
   if (!tab.url.includes('youtube.com/watch')) {
     console.log('Not a youtube watch page')
     return
   }
   const video = document.querySelector('video')
   const overlayEle = document.getElementById('youtube-quick-note-overlay')
-  console.log(tab.url)
+
   if (overlayEle) {
     overlayEle.remove()
     if (video && video.paused) {
@@ -60,33 +44,69 @@ async function handleScreenShot(tab: unknown) {
   if (video && !video.paused) {
     const currentYoutubeInfo = getYoutubeInfo()
     if (!currentYoutubeInfo) return
+    const queryParameters = tab.url.split('?')[1]
+    const urlParameters = new URLSearchParams(queryParameters)
+    const vid = urlParameters.get('v')
     video.pause()
     document.body.appendChild(overlay)
-    handleAddBookmark({ ...currentYoutubeInfo, tabID: tab.id, url: tab.url })
+    const result = handleAddBookmark({
+      title: currentYoutubeInfo.title,
+      tabID: tab.id,
+      vid: vid!,
+      notes: [{ desc: '', timeStamp: currentYoutubeInfo.timeStamp, attachment: '' }],
+      url: tab.url,
+      createdAt: new Date().toISOString()
+    })
+    return result
   }
 }
-const fetchBookmarks = () => {
-  chrome.storage.local.get(['data']).then((result) => {
-    if (result.data) {
-      return JSON.parse(result.data)
-    }
-  })
-  return []
-}
-const handleAddBookmark = async (newBookmark) => {
-  const bookmarks = fetchBookmarks()
-  console.log(bookmarks)
-  chrome.storage.sync.set({
-    data: JSON.stringify([...bookmarks, newBookmark].sort((a, b) => b.createdAt - a.createdAt))
-  })
+const fetchBookmarks = async () => {
+  const getStorage = await chrome.storage.local.get(['data'])
+  console.log(getStorage)
+  if (getStorage && getStorage.data) {
+    return JSON.parse(getStorage.data)
+  }
 }
 
+const handleAddBookmark = async (newBookmark: Item) => {
+  let bookmarks = await fetchBookmarks()
+  if (!bookmarks) {
+    bookmarks = {}
+  }
+  const { vid, notes } = newBookmark
+  if (bookmarks[vid]) {
+    bookmarks[vid].notes.push({
+      desc: notes[0].desc || '',
+      timeStamp: notes[0].timeStamp,
+      attachment: notes[0].attachment || ''
+    })
+  } else {
+    bookmarks[vid] = newBookmark
+  }
+  return new Promise((resolve) => {
+    chrome.storage.local.set({ data: JSON.stringify(bookmarks) }, () => {
+      resolve(bookmarks)
+    })
+  })
+  // const storage = chrome.storage.local.set({ data: JSON.stringify(bookmarks) })
+  // storage.then(() => {
+  //   console.log("before return")
+  //   return bookmarks
+  // })
+}
+
+const clearLocalStorage = () => {
+  chrome.storage.local.clear(() => {
+    console.log('cleared all')
+  })
+}
 ;(() => {
-  chrome.runtime.onMessage.addListener(function (message, _sender, sendResponse) {
+  chrome.runtime.onMessage.addListener(async (message, _sender, sendResponse) => {
     // Handle the message here
     const tab = JSON.parse(message.tab)
-    console.log(tab)
-    handleScreenShot(tab)
-    sendResponse([])
+    const bookmarks = await handleScreenShot(tab)
+    console.log(bookmarks)
+    sendResponse(bookmarks)
+    return true
   })
 })()
