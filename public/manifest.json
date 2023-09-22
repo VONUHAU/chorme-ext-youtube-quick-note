@@ -13,13 +13,16 @@
         "src/content/index.js"
       ],
       "matches": [
-        "https://www.youtube.com/*"
+        "<all_urls>"
       ]
     }
   ],
   "action": {
     "default_popup": "src/popup/index.html"
   },
+  "host_permissions": [
+    "https://*/*"
+  ],
   "permissions": [
     "scripting",
     "activeTab",

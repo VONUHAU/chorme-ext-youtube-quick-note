@@ -5,11 +5,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        text: '#ffffff',
-        background: '#060b1e',
-        primary: '#efdea9',
-        secondary: '#09122f',
-        accent: '#d7af2d'
+        text: 'var(--text)',
+        background: 'var(--background)',
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        accent: 'var(--accent)'
       }
     }
   },

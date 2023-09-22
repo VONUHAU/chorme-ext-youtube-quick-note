@@ -13,12 +13,13 @@ const manifest: Manifest.WebExtensionManifest = {
   content_scripts: [
     {
       js: ['src/content/index.js'],
-      matches: ['https://www.youtube.com/*']
+      matches: ['<all_urls>']
     }
   ],
   action: {
     default_popup: 'src/popup/index.html'
   },
+  host_permissions: ['https://*/*'],
   permissions: ['scripting', 'activeTab', 'tabs', 'storage', 'unlimitedStorage'],
   commands: {
     _execute_action: {

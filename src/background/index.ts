@@ -1,5 +1,4 @@
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('onInstall')
   chrome.action.setBadgeText({
     text: 'OFF'
   })
@@ -26,5 +25,28 @@ chrome.tabs.onUpdated.addListener(async (tabId, tab) => {
       type: 'NEW',
       videoId: urlParameters.get('v')
     })
+  }
+})
+function playAtTime(time: number) {
+  console.log('hello play at time')
+  document.addEventListener('DOMContentLoaded', function () {
+    const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
+    console.log(youtubePlayer)
+    youtubePlayer.currentTime = time
+  })
+}
+
+chrome.runtime.onMessage.addListener(async function (request) {
+  if (request.openNewTab) {
+    const data = JSON.parse(request.openNewTab)
+    const newTab = await chrome.tabs.create({ url: data.url })
+    console.log(newTab)
+    chrome.scripting
+      .executeScript({
+        target: { tabId: newTab.id! },
+        func: playAtTime,
+        args: [data.time]
+      })
+      .then(() => console.log('script injected'))
   }
 })

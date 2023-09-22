@@ -4,17 +4,55 @@ import { Item } from '../Interface'
 
 function getYoutubeInfo() {
   const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
-  const titleEle = document.getElementById('title')
-  const title = titleEle && titleEle.innerHTML
+  const titleEle = document.querySelector('#title h1.style-scope.ytd-watch-metadata .style-scope.ytd-watch-metadata')
+  const title = titleEle && titleEle.innerText
   const currentTime = youtubePlayer && youtubePlayer.currentTime
   if (!youtubePlayer || !title) return
-  return { title, timeStamp: getTime(currentTime) }
+  return { title, timeStamp: currentTime }
 }
 
 function getTime(t) {
   const date = new Date(0)
   date.setSeconds(t)
   return date.toISOString().substr(11, 8)
+}
+
+function removeOverlay() {
+  const overlayEle = document.getElementById('youtube-quick-note-overlay')
+  if (overlayEle) {
+    overlayEle.remove()
+  }
+}
+
+async function getCurrentTab() {
+  const queryOptions = { active: true, lastFocusedWindow: true }
+  const [tab] = await chrome.tabs.query(queryOptions)
+  return tab
+}
+
+function extractYouTubeVideoId(url) {
+  // Regular expression to match the video ID in the URL
+  const regex = /[?&]v=([^?&]+)/
+
+  // Use the regex to extract the video ID
+  const match = url.match(regex)
+
+  // If a match is found, return the video ID; otherwise, return null
+  if (match) {
+    return match[1]
+  } else {
+    return null
+  }
+}
+
+function getCurrentVid() {
+  const url = window.location.href
+  const regex = /[?&]v=([^?&]+)/
+  const match = url.match(regex)
+  if (match) {
+    return match[1]
+  }
+  return null
 }
 
 async function handleScreenShot(tab) {
@@ -95,6 +133,10 @@ const handleAddBookmark = async (newBookmark: Item) => {
   // })
 }
 
+const playAtTine = (time: number) => {
+  const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
+  youtubePlayer.currentTime = time
+}
 const clearLocalStorage = () => {
   chrome.storage.local.clear(() => {
     console.log('cleared all')
@@ -103,10 +145,21 @@ const clearLocalStorage = () => {
 ;(() => {
   chrome.runtime.onMessage.addListener(async (message, _sender, sendResponse) => {
     // Handle the message here
-    const tab = JSON.parse(message.tab)
-    const bookmarks = await handleScreenShot(tab)
-    console.log(bookmarks)
-    sendResponse(bookmarks)
-    return true
+    if (message.type == 'CAPTURE') {
+      const tab = JSON.parse(message.tab)
+      const bookmarks = await handleScreenShot(tab)
+      console.log(bookmarks)
+      sendResponse(bookmarks)
+      return true
+    }
+    if (message.type == 'PLAY') {
+      removeOverlay() // remove over layer if it existed
+      console.log(`${getCurrentVid()} url: ${message.url} time: ${message.time}`)
+      if (getCurrentVid() == message.vid) {
+        playAtTine(message.time)
+      } else {
+        chrome.runtime.sendMessage({ openNewTab: JSON.stringify({ url: message.url, time: message.time }) })
+      }
+    }
   })
 })()

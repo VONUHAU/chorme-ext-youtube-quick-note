@@ -6,7 +6,11 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  --background: #060b1e;
+  --text: #000000;
+  --background: #ffffff;
+  --primary: #8fb3ff;
+  --secondary: #ebf1ff;
+  --accent: #d41d6d;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   font-synthesis: none;

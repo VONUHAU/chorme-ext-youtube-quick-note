@@ -27,7 +27,7 @@ function App() {
 
   const handleCapture = async () => {
     const tab = await getCurrentTab()
-    const response = await chrome.tabs.sendMessage(tab.id!, { tab: JSON.stringify(tab) })
+    const response = await chrome.tabs.sendMessage(tab.id!, { type: 'CAPTURE', tab: JSON.stringify(tab) })
     console.log(response)
   }
 
