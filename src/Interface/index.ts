@@ -5,7 +5,7 @@ export type Item = {
   notes: [
     {
       desc?: string
-      timeStamp: string
+      timeStamp: number
       attachment?: string
     }
   ]

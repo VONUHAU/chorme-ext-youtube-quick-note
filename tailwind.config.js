@@ -9,7 +9,9 @@ export default {
         background: 'var(--background)',
         primary: 'var(--primary)',
         secondary: 'var(--secondary)',
-        accent: 'var(--accent)'
+        tertiary: 'var(--tertiary)',
+        accent: 'var(--accent)',
+        background_rgba: 'var(--background-rgba)'
       }
     }
   },

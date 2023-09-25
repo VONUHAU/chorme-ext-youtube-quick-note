@@ -13,3 +13,9 @@ export const fetchBookmarks = async () => {
     return JSON.parse(getStorage.data)
   }
 }
+
+export const formatTimeStamp = (time: number) => {
+  const date = new Date(0)
+  date.setSeconds(time)
+  return date.toISOString().substr(11, 8)
+}

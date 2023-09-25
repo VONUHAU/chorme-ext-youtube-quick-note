@@ -11,12 +11,6 @@ function getYoutubeInfo() {
   return { title, timeStamp: currentTime }
 }
 
-function getTime(t) {
-  const date = new Date(0)
-  date.setSeconds(t)
-  return date.toISOString().substr(11, 8)
-}
-
 function removeOverlay() {
   const overlayEle = document.getElementById('youtube-quick-note-overlay')
   if (overlayEle) {
@@ -54,8 +48,20 @@ function getCurrentVid() {
   }
   return null
 }
+function addOverLayer() {
+  const overlay = document.createElement('div')
+  overlay.id = 'youtube-quick-note-overlay'
+  overlay.style.position = 'fixed'
+  overlay.style.top = '0'
+  overlay.style.left = '0'
+  overlay.style.width = '100%'
+  overlay.style.height = '100%'
+  overlay.style.backgroundColor = 'rgba(128, 128, 128, 0.5)' // Gray with 50% opacity
+  overlay.style.zIndex = '9999' // Ensure it's on top of other elements
+  document.body.appendChild(overlay)
+}
 
-async function handleScreenShot(tab) {
+async function handleScreenShot(tab: any, isExtract?: boolean) {
   if (!tab.url.includes('youtube.com/watch')) {
     console.log('Not a youtube watch page')
     return
@@ -70,23 +76,14 @@ async function handleScreenShot(tab) {
     }
     return
   }
-  const overlay = document.createElement('div')
-  overlay.id = 'youtube-quick-note-overlay'
-  overlay.style.position = 'fixed'
-  overlay.style.top = '0'
-  overlay.style.left = '0'
-  overlay.style.width = '100%'
-  overlay.style.height = '100%'
-  overlay.style.backgroundColor = 'rgba(128, 128, 128, 0.5)' // Gray with 50% opacity
-  overlay.style.zIndex = '9999' // Ensure it's on top of other elements
-  if (video && !video.paused) {
+  if (video) {
     const currentYoutubeInfo = getYoutubeInfo()
     if (!currentYoutubeInfo) return
     const queryParameters = tab.url.split('?')[1]
     const urlParameters = new URLSearchParams(queryParameters)
     const vid = urlParameters.get('v')
     video.pause()
-    document.body.appendChild(overlay)
+    isExtract && addOverLayer()
     const result = handleAddBookmark({
       title: currentYoutubeInfo.title,
       tabID: tab.id,
@@ -126,30 +123,39 @@ const handleAddBookmark = async (newBookmark: Item) => {
       resolve(bookmarks)
     })
   })
-  // const storage = chrome.storage.local.set({ data: JSON.stringify(bookmarks) })
-  // storage.then(() => {
-  //   console.log("before return")
-  //   return bookmarks
-  // })
 }
 
 const playAtTine = (time: number) => {
   const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
   youtubePlayer.currentTime = time
 }
+
 const clearLocalStorage = () => {
   chrome.storage.local.clear(() => {
     console.log('cleared all')
   })
 }
+const handleResponse = async (sendResponse: (response: any) => void, tab: any, isExtract: boolean = false) => {
+  const bookmarks = await handleScreenShot(tab, isExtract)
+  console.log(bookmarks)
+  sendResponse(bookmarks)
+}
+
 ;(() => {
-  chrome.runtime.onMessage.addListener(async (message, _sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     // Handle the message here
-    if (message.type == 'CAPTURE') {
+    if (message.type == 'BOOKMARK') {
       const tab = JSON.parse(message.tab)
-      const bookmarks = await handleScreenShot(tab)
-      console.log(bookmarks)
-      sendResponse(bookmarks)
+      handleResponse(sendResponse, tab)
+      return true
+    }
+    if (message.type == 'EXTRACT') {
+      const tab = JSON.parse(message.tab)
+      handleResponse(sendResponse, tab, true)
+      return true
+    }
+    if (message.type == 'OPEN_NEW_TAB') {
+      window.open(message.url, '_blank')
       return true
     }
     if (message.type == 'PLAY') {
