@@ -19,7 +19,6 @@ export const TextEditor: React.FC<TextProp> = ({ index, vid, content }) => {
   useEffect(() => {
     const onSave = async () => {
       const bookmarks = await fetchBookmarks()
-      console.log(`oldNote: ${bookmarks[vid].notes[index].desc} currectDecs: ${throttledValue}`)
       bookmarks[vid].notes[index].desc = throttledValue
       chrome.storage.local.set({ data: JSON.stringify(bookmarks) })
     }
@@ -35,11 +34,14 @@ export const TextEditor: React.FC<TextProp> = ({ index, vid, content }) => {
   const handleOnFocus = () => {
     setShowToolbar(true)
   }
-  const handleOnChange = (content, _delta, _source, editor) => {
-    content && setTexts(editor.getHTML())
+  const handleOnChange = (content: string, _delta, _source, editor) => {
+    const html = editor.getHTML()
+    if (html.replace(/<(.|\n)*?>/g, '').trim().length === 0) setTexts('')
+    else setTexts(html)
   }
   return (
     <div className='text-background'>
+      <div> {`show content: ${content} text: ${texts}`}</div>
       <div className={showToolbar ? 'block' : 'hidden'}>
         <CustomToolbar id={`toolbar-${vid}-${index}`} />
       </div>

@@ -88,7 +88,7 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
       title: currentYoutubeInfo.title,
       tabID: tab.id,
       vid: vid!,
-      notes: [{ desc: '', timeStamp: currentYoutubeInfo.timeStamp, attachment: '' }],
+      notes: [{ id: Date.now(), desc: '', timeStamp: currentYoutubeInfo.timeStamp, attachment: '' }],
       url: tab.url,
       createdAt: new Date().toISOString()
     })
@@ -109,12 +109,15 @@ const handleAddBookmark = async (newBookmark: Item) => {
     bookmarks = {}
   }
   const { vid, notes } = newBookmark
+  console.log(notes)
   if (bookmarks[vid]) {
-    bookmarks[vid].notes.push({
+    bookmarks[vid].notes.unshift({
+      id: notes[0].id,
       desc: notes[0].desc || '',
       timeStamp: notes[0].timeStamp,
       attachment: notes[0].attachment || ''
     })
+    // bookmarks[vid].notes.sort((a, b) => a.timeStamp - b.timeStamp)
   } else {
     bookmarks[vid] = newBookmark
   }

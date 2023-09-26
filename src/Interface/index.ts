@@ -4,6 +4,7 @@ export type Item = {
   title?: string
   notes: [
     {
+      id: number
       desc?: string
       timeStamp: number
       attachment?: string
@@ -11,4 +12,6 @@ export type Item = {
   ]
   url?: string
   createdAt?: string
+  isExpand?: boolean
+  newCreated?: boolean
 }

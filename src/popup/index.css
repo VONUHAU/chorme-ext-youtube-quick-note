@@ -11,7 +11,7 @@
   --background-rgba: rgba(255, 255, 255, 0.4);
   --primary: #8fb3ff;
   --secondary: #ebf1ff;
-  --accent: #d41d6d;
+  --accent: #978ad5; 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   font-synthesis: none;
@@ -20,9 +20,22 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+body {
+  background: white;
+  margin: 0;
+  display: flex;
+  place-items: center;
+  width: 320px;
+  min-height: 400px;
+  height: clamp(400px, 100vh, 600px);
+}
 
+#root{
+  width: 100%;
+  height: 100%;
+}
 .blur-bg{
-  position: absolute;
+  position: fixed;
   width: 100%;
   height: 100%;
   top: 0;
@@ -30,6 +43,77 @@
   z-index: -1;
   filter: blur(30px);
   background: linear-gradient(70deg, #A5C1FA 54.86%, #FF8FF4 72.11%);
+}
+.blur-bg::after{
+  position: absolute;
+  content: "";
+  width: 160px;
+  height: 160px;
+  border-radius: 9999px;
+  background-color: #f54ae5;
+  top: 20%;
+  animation: moving 14s alternate infinite;
+}
+.blur-bg::before{
+  position: absolute;
+  content: "";
+  width: 160px;
+  height: 160px;
+  border-radius: 9999px;
+  background-color: #2083f9;
+  top: 80%;
+  left: 20%;
+  animation: moving2 16s alternate infinite;
+}
+@keyframes moving {
+  from {
+    opacity: 0.6;
+    transform: rotate(180deg);
+  }
+
+  25%{
+    opacity: 0.3;
+  }
+
+  50%{
+    opacity: 0.75;
+    transform: scale3d(3, 3, 4);
+  }
+
+  75%{
+    opacity: 0.6;
+
+  }
+
+  to{
+    opacity: 0.4;
+    transform: rotate(360deg);
+  }
+}
+@keyframes moving2 {
+  from {
+    opacity: 0.8;
+    transform: rotate(90deg);
+  }
+
+  25%{
+    opacity: 0.3;
+  }
+
+  60%{
+    opacity: 0.8;
+    transform: scale3d(3, 3, 4);
+  }
+
+  75%{
+    opacity: 0.6;
+
+  }
+
+  to{
+    opacity: 0.4;
+    transform: rotate(180deg);
+  }
 }
 a {
   font-weight: 500;
@@ -42,13 +126,7 @@ a:hover {
 .bookmark {
   background: linear-gradient(90deg, #A5C1FA 24.86%, #FF8FF4 92.11%);
 }
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 400px;
-}
+
 
 h1 {
   font-size: 3.2em;
