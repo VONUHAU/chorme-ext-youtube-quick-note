@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Card from '../components/card.tsx'
-import { InitPage } from '../components/initPage.tsx'
+import Toast from '../components/toast.tsx'
 import { getCurrentTab, fetchBookmarks } from '../../utils/index.ts'
 import { Item } from '../Interface/index.ts'
 import './index.css'
@@ -8,6 +8,7 @@ import './index.css'
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>([])
+  const [toast, setToast] = useState()
   // handle load data from chrome storage
   useEffect(() => {
     const initData = async () => {
@@ -44,18 +45,22 @@ function App() {
   const handleCapture = async (type: string) => {
     const tab = await getCurrentTab()
     chrome.tabs.sendMessage(tab.id!, { type, tab: JSON.stringify(tab) }, (response) => {
-      if (!response) return
+      console.log(response)
+      if (!response || response.status == 'fail') {
+        setToast(response.message)
+        return
+      }
+      let data = response.data
       const queryParameters = tab.url!.split('?')[1]
       const urlParameters = new URLSearchParams(queryParameters)
       const vid = urlParameters.get('v')
-      const activeObj = response[vid!]
+      const activeObj = data[vid!]
       activeObj.isExpand = true
       activeObj.newCreated = true
-      delete response[vid!]
-      response = Object.values(response)
-      response = response.sort((a: Item, b: Item) => new Date(b.createdAt) - new Date(a.createdAt))
-      response.unshift(activeObj)
-      setData(response)
+      delete data[vid!]
+      data = Object.values(data)
+      data.unshift(activeObj)
+      setData(data)
     })
   }
 
@@ -70,14 +75,10 @@ function App() {
               : 'relative left-1/2 top-1/2 transition-all ease-in-out translate-y-[-50%] translate-x-[-50%]'
           }
         >
-          <div
-            className={
-              data.length > 0 ? 'flex items-center justify-center mb-3' : 'flex items-center justify-start mb-3'
-            }
-          >
+          <div className={data.length > 0 ? 'flex items-center justify-center' : 'flex items-center justify-start'}>
             <img src='/logo-08.png' alt='youtube-quick-bookmark' width={data.length > 0 ? 130 : 180} />
           </div>
-          <div className='task mb-3'>
+          <div className='task my-4'>
             <div className='flex flex-row gap-3 justify-start items-center'>
               <button onClick={() => handleCapture('BOOKMARK')} className='w-6 opacity-90 rounded cursor-pointer'>
                 <svg fill='#ffffff' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'>
@@ -109,8 +110,8 @@ function App() {
             </div>
           </div>
         </div>
-
-        <section className='space-y-3'>
+        {toast ? <Toast message={toast} setMessage={setToast} /> : null}
+        <section className='space-y-2'>
           {data.map((value: Item, key: number) => (
             <Card key={key} {...value} setData={setData} />
           ))}

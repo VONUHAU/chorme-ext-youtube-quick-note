@@ -79,7 +79,7 @@ export default function Card({ title, notes, url, vid, isExpand, newCreated, set
       <div
         className={
           accordion
-            ? 'space-y-2 transition-all max-h-screen ease-in-out'
+            ? 'space-y-2 transition-all ease-in-out'
             : 'space-y-2 max-h-0 overflow-hidden transition-all ease-in-out'
         }
         ref={ref}

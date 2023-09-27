@@ -26,8 +26,7 @@ body {
   display: flex;
   place-items: center;
   width: 320px;
-  min-height: 400px;
-  height: clamp(400px, 100vh, 600px);
+  height: clamp(500px, 100vh, 600px);
 }
 
 #root{
@@ -113,6 +112,19 @@ body {
   to{
     opacity: 0.4;
     transform: rotate(180deg);
+  }
+}
+.toast{
+  animation: toast 0.5s ease-in-out;
+}
+@keyframes toast {
+  from {
+    translate: -100% 0;
+    opacity: 1;
+  }
+  to{
+    translate: 0 0;
+    opacity: 1;
   }
 }
 a {

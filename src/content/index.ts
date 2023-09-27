@@ -48,6 +48,12 @@ function getCurrentVid() {
   }
   return null
 }
+function formatTimeStamp(time: number) {
+  const date = new Date(0)
+  date.setSeconds(time)
+  return date.toISOString().substr(11, 8)
+}
+
 function addOverLayer() {
   const overlay = document.createElement('div')
   overlay.id = 'youtube-quick-note-overlay'
@@ -108,22 +114,44 @@ const handleAddBookmark = async (newBookmark: Item) => {
   if (!bookmarks) {
     bookmarks = {}
   }
+  const response = { status: '', message: '', data: {} }
   const { vid, notes } = newBookmark
-  console.log(notes)
+  let index = null
+  let newNote = {}
   if (bookmarks[vid]) {
-    bookmarks[vid].notes.unshift({
-      id: notes[0].id,
-      desc: notes[0].desc || '',
-      timeStamp: notes[0].timeStamp,
-      attachment: notes[0].attachment || ''
-    })
-    // bookmarks[vid].notes.sort((a, b) => a.timeStamp - b.timeStamp)
+    const cloneNotes = JSON.parse(JSON.stringify(bookmarks[vid].notes))
+    // Check for duplicate timestamps to prevent data redundancy
+    const isExist = cloneNotes.some(
+      (note: any) => formatTimeStamp(note.timeStamp) == formatTimeStamp(notes[0].timeStamp)
+    )
+    if (isExist) {
+      response.status = 'fail'
+      response.message = 'The timestamp already exists.'
+    } else {
+      newNote = {
+        id: notes[0].id,
+        desc: notes[0].desc || '',
+        timeStamp: notes[0].timeStamp,
+        attachment: notes[0].attachment || ''
+      }
+      cloneNotes.unshift(newNote)
+      index = cloneNotes.findIndex((item) => item.id === notes[0].id)
+      response.status = 'success'
+      bookmarks[vid].notes = cloneNotes
+    }
   } else {
     bookmarks[vid] = newBookmark
   }
+  const cloneBookmark = JSON.parse(JSON.stringify(bookmarks))
+  if (index) {
+    cloneBookmark[vid].notes.splice(index, 1)
+    cloneBookmark[vid].notes.unshift(newNote)
+  }
+  console.log(index, cloneBookmark)
+  response.data = cloneBookmark
   return new Promise((resolve) => {
     chrome.storage.local.set({ data: JSON.stringify(bookmarks) }, () => {
-      resolve(bookmarks)
+      resolve(response)
     })
   })
 }
