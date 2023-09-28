@@ -117,16 +117,18 @@ const handleAddBookmark = async (newBookmark: Item) => {
   const response = { status: '', message: '', data: {} }
   const { vid, notes } = newBookmark
   let index = null
-  let newNote = {}
+  let newNote = null
   if (bookmarks[vid]) {
     const cloneNotes = JSON.parse(JSON.stringify(bookmarks[vid].notes))
     // Check for duplicate timestamps to prevent data redundancy
-    const isExist = cloneNotes.some(
+    const isExist = cloneNotes.findIndex(
       (note: any) => formatTimeStamp(note.timeStamp) == formatTimeStamp(notes[0].timeStamp)
     )
-    if (isExist) {
+    if (isExist >= 0) {
       response.status = 'fail'
       response.message = 'The timestamp already exists.'
+      index = isExist
+      newNote = cloneNotes[index]
     } else {
       newNote = {
         id: notes[0].id,

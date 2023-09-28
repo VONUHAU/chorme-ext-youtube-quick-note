@@ -11,7 +11,9 @@
   --background-rgba: rgba(255, 255, 255, 0.4);
   --primary: #8fb3ff;
   --secondary: #ebf1ff;
-  --accent: #978ad5; 
+  --accent: #978ad5;
+  --error: #ff3957;
+  --success: #009103;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   font-synthesis: none;
@@ -115,11 +117,33 @@ body {
   }
 }
 .toast{
-  animation: toast 0.5s ease-in-out;
+  animation: toast 0.3s ease;
 }
+.y-button:hover .y-button svg, .y-button:focus .y-button svg, .y-button:focus-visible, .y-button:active{
+  fill: var(--accent);
+}
+.toast-fadeOut{
+  animation: fadeOut 0.1s ease;
+}
+.search-box:hover, .search-box:focus, .search-box:focus-visible{
+  outline: var(--accent);
+}
+option {
+  background-color: white;
+  padding: 4px;
+  color: blue;
+  margin-bottom: 1px;
+   font-size: 18px;
+  cursor: pointer;
+}
+@keyframes fadeOut {
+  0% {display: block; opacity: 100%}
+  100% {display: hidden; opacity: 0%}
+}
+
 @keyframes toast {
   from {
-    translate: -100% 0;
+    translate: 0 -100%;
     opacity: 1;
   }
   to{

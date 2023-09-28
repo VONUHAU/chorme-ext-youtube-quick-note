@@ -11,6 +11,8 @@ export default {
         secondary: 'var(--secondary)',
         tertiary: 'var(--tertiary)',
         accent: 'var(--accent)',
+        error: 'var(--error)',
+        success: 'var(--success)',
         background_rgba: 'var(--background-rgba)'
       }
     }
