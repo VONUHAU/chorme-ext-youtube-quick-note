@@ -12,16 +12,16 @@ export default function Toast({ message, setMessage }: Props) {
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       setMessage('')
-    }, 2500)
+    }, 3000)
     return () => clearTimeout(timeoutRef.current)
-  }, [])
+  }, [message, setMessage])
 
   const handleClick = () => {
     setMessage('')
     clearTimeout(timeoutRef.current)
   }
   return (
-    <div ref={ref} className='toast-wrapper' onClick={handleClick}>
+    <div ref={ref} className={`toast-wrapper hidden ${message ? 'show' : ''}`} onClick={handleClick}>
       <div className='toast fixed left-1/2 -translate-x-1/2 z-50 top-[10px] bg-error rounded text-background w-10/12 p-1.5 font-sans text-sm'>
         {message}
       </div>

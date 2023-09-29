@@ -3,14 +3,17 @@ import Card from '../components/card.tsx'
 import Toast from '../components/toast.tsx'
 import { getCurrentTab, fetchBookmarks } from '../../utils/index.ts'
 import { Item } from '../Interface/index.ts'
+import Datalist from '../components/dataList.tsx'
 import './index.css'
 
 function App() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [data, setData] = useState<any>([])
+  const [mapData, setMapData] = useState<Item[]>([])
   const [toast, setToast] = useState<string>('')
   // handle load data from chrome storage
   useEffect(() => {
+    // handleClearStorageData()
     const initData = async () => {
       const result = await Promise.allSettled([fetchBookmarks(), getCurrentTab()])
       const [storageData, tab] = result
@@ -68,6 +71,10 @@ function App() {
       setData(data)
     })
   }
+
+  useEffect(() => {
+    setMapData(data)
+  }, [data])
 
   return (
     <>
@@ -134,23 +141,13 @@ function App() {
                 </button>
               ) : null}
             </div>
-            <input
-              type='text'
-              list='data'
-              placeholder='Select your youtube card'
-              className='search-box bg-background bg-opacity-50 rounded p-1 w-[55%] text-accent'
-            />
-            <datalist id='data'>
-              {data.map((item: Item, key) => (
-                <option key={key} value={item.title} />
-              ))}
-            </datalist>
+            <Datalist data={data} mapData={mapData} setData={setMapData} />
           </div>
         </div>
-        {toast ? <Toast message={toast} setMessage={setToast} /> : null}
+        <Toast message={toast} setMessage={setToast} />
 
         <section className='space-y-2'>
-          {data.map((value: Item, key: number) => (
+          {mapData.map((value: Item, key: number) => (
             <Card key={key} {...value} setData={setData} />
           ))}
         </section>
