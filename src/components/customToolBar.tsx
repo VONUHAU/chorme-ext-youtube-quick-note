@@ -3,20 +3,28 @@ type CustomToolBarProp = {
 }
 export const CustomToolbar: React.FC<CustomToolBarProp> = ({ id }) => (
   <div id={id}>
-    <select className='ql-header' defaultValue=''>
-      <option value='1' />
-      <option value='2' />
-      <option value='3' />
-      <option value='' />
-    </select>
-    <span className='ql-formats'>
-      <button className='ql-list' value='ordered' />
-      <button className='ql-list' value='bullet' />
-      <button className='ql-indent' value='-1' />
-      <button className='ql-indent' value='+1' />
-    </span>
+    <button className='ql-header' value='1' />
+    <button className='ql-header' value='2' />
+    <button className='ql-header' value='3'>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'>
+        <path d='M10.18,4V14a1,1,0,0,1-2,0V10h-5v4a1,1,0,0,1-2,0V4a1,1,0,1,1,2,0V8h5V4a1,1,0,0,1,2,0Z' />
+        <path d='M13.52,9.51a1.44,1.44,0,0,0,.93-.32,1.1,1.1,0,0,0,.39-.91,1,1,0,0,0-.31-.77,1.09,1.09,0,0,0-.84-.33,1.4,1.4,0,0,0-.58.1.94.94,0,0,0-.37.26,1.88,1.88,0,0,0-.26.43l-.22.48a.36.36,0,0,1-.21.19.78.78,0,0,1-.35.08.62.62,0,0,1-.43-.2.65.65,0,0,1-.2-.5,1.34,1.34,0,0,1,.19-.64,2.28,2.28,0,0,1,.54-.65,2.64,2.64,0,0,1,.88-.48,3.36,3.36,0,0,1,1.18-.19,3.15,3.15,0,0,1,1,.16,2.44,2.44,0,0,1,.81.44,2.1,2.1,0,0,1,.52.68,2,2,0,0,1,.18.84,1.88,1.88,0,0,1-.26,1,3.39,3.39,0,0,1-.73.82,3.06,3.06,0,0,1,.77.56,2.11,2.11,0,0,1,.47.7,2.08,2.08,0,0,1,.16.83A2.6,2.6,0,0,1,16,14a3.11,3.11,0,0,1-1,.61,3.4,3.4,0,0,1-1.26.22,3.15,3.15,0,0,1-1.26-.25,3,3,0,0,1-.92-.63,2.93,2.93,0,0,1-.54-.79,1.56,1.56,0,0,1-.19-.66A.75.75,0,0,1,11,12a.77.77,0,0,1,.55-.21.55.55,0,0,1,.32.1.49.49,0,0,1,.2.23,3.92,3.92,0,0,0,.65,1.21,1.24,1.24,0,0,0,1,.39,1.57,1.57,0,0,0,.7-.17A1.49,1.49,0,0,0,15,13a1.59,1.59,0,0,0,.22-.82,1.47,1.47,0,0,0-.38-1.07,1.38,1.38,0,0,0-1-.39,2.71,2.71,0,0,0-.36,0l-.32,0a.7.7,0,0,1-.5-.16.56.56,0,0,1-.17-.45.55.55,0,0,1,.21-.45.94.94,0,0,1,.62-.17Z' />
+      </svg>
+    </button>
+    <button className='ql-header' value=''>
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'>
+        <path d='M13.5,4V14a1,1,0,0,1-2,0V10h-5v4a1,1,0,0,1-2,0V4a1,1,0,0,1,2,0V8h5V4a1,1,0,0,1,2,0Z' />
+      </svg>
+    </button>
+
+    <button className='ql-list' value='ordered' />
+    <button className='ql-list' value='bullet' />
+    <button className='ql-indent' value='-1' />
+    <button className='ql-indent' value='+1' />
+
     <button className='ql-bold' />
     <button className='ql-italic' />
     <button className='ql-underline' />
+    <button className='ql-code-block' />
   </div>
 )

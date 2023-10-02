@@ -2,6 +2,68 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Item } from '../Interface'
 
+let isCapturing = false
+let startX, startY, endX, endY
+let captureImageData = ''
+
+function stopScreenshot() {
+  isCapturing = false
+  document.getElementById('youtube-quick-note-overlay')?.remove()
+  document.getElementById('youtube-quick-note-capture-area')?.remove()
+  captureImageData = captureAndExtractText()
+}
+
+document.addEventListener('mousedown', (e) => {
+  if (isCapturing) {
+    startX = e.clientX
+    startY = e.clientY
+    document.getElementById('youtube-quick-note-capture-area')!.style.left = startX + 'px'
+    document.getElementById('youtube-quick-note-capture-area')!.style.top = startY + 'px'
+  }
+})
+
+document.addEventListener('mousemove', (e) => {
+  if (isCapturing) {
+    endX = e.clientX
+    endY = e.clientY
+    const width = endX - startX
+    const height = endY - startY
+    document.getElementById('youtube-quick-note-capture-area')!.style.width = width + 'px'
+    document.getElementById('youtube-quick-note-capture-area')!.style.height = height + 'px'
+  }
+})
+
+document.addEventListener('mouseup', (e) => {
+  if (isCapturing) {
+    stopScreenshot()
+  }
+})
+
+async function captureAndExtractText() {
+  const x = startX
+  const y = startY
+  const width = endX - startX
+  const height = endY - startY
+
+  // Capture the selected area as an image
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+
+  const video = document.getElementsByTagName('video')
+
+  ctx.drawImage(video, x, y, width, height, 0, 0, width, height)
+
+  // Convert the canvas to a data URL
+  const imageDataUrl = canvas.toDataURL('image/png')
+  const link = document.createElement('a')
+  link.href = screenshotURL
+  link.download = 'screenshot.png'
+  link.click()
+  return imageDataUrl
+}
+
 function getYoutubeInfo() {
   const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
   const titleEle = document.querySelector('#title h1.style-scope.ytd-watch-metadata .style-scope.ytd-watch-metadata')
@@ -55,6 +117,7 @@ function formatTimeStamp(time: number) {
 }
 
 function addOverLayer() {
+  //add overlay element
   const overlay = document.createElement('div')
   overlay.id = 'youtube-quick-note-overlay'
   overlay.style.position = 'fixed'
@@ -64,7 +127,13 @@ function addOverLayer() {
   overlay.style.height = '100%'
   overlay.style.backgroundColor = 'rgba(128, 128, 128, 0.5)' // Gray with 50% opacity
   overlay.style.zIndex = '9999' // Ensure it's on top of other elements
+  // add capture area element
+  const captureArea = document.createElement('div')
+  captureArea.id = 'youtube-quick-note-capture-area'
+  captureArea.style.border = '2px dashed white'
+  captureArea.style.position = 'absolute'
   document.body.appendChild(overlay)
+  document.body.appendChild(captureArea)
 }
 
 async function handleScreenShot(tab: any, isExtract?: boolean) {
@@ -89,7 +158,12 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
     const urlParameters = new URLSearchParams(queryParameters)
     const vid = urlParameters.get('v')
     video.pause()
-    isExtract && addOverLayer()
+    if (isExtract) {
+      isCapturing = true
+      addOverLayer()
+      console.log(captureImageData)
+    }
+
     const result = handleAddBookmark({
       title: currentYoutubeInfo.title,
       tabID: tab.id,
@@ -98,7 +172,7 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
       url: tab.url,
       createdAt: new Date().toISOString()
     })
-    return result
+    return { ...result, imageData: JSON.stringify(captureImageData) }
   }
 }
 const fetchBookmarks = async () => {
@@ -196,8 +270,6 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       console.log(`${getCurrentVid()} url: ${message.url} time: ${message.time}`)
       if (getCurrentVid() == message.vid) {
         playAtTine(message.time)
-      } else {
-        chrome.runtime.sendMessage({ openNewTab: JSON.stringify({ url: message.url, time: message.time }) })
       }
     }
   })

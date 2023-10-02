@@ -5,28 +5,34 @@ import { CustomToolbar } from './customToolBar'
 import useThrottle from './useThrottle'
 import 'react-quill/dist/quill.snow.css'
 import { fetchBookmarks } from '../../utils'
+import { HTMLMouseEvent } from './card'
 interface TextProp {
   index: number
   vid: string
-  content: string
+  notes: any
 }
 
-export const TextEditor: React.FC<TextProp> = ({ index, vid, content }) => {
-  const [texts, setTexts] = useState(content)
-  // const throttledValue = useThrottle(texts)
+export const TextEditor: React.FC<TextProp> = ({ index, vid, notes }) => {
+  const [texts, setTexts] = useState(notes[index].desc)
+  const throttledValue = useThrottle(texts)
   const [showToolbar, setShowToolbar] = useState(false)
+  const [toolbarFocus, setToobarFocus] = useState(false)
 
-  // useEffect(() => {
-  //   const onSave = async () => {
-  //     const bookmarks = await fetchBookmarks()
-  //     bookmarks[vid].notes[index].desc = throttledValue
-  //     console.log(throttledValue)
-  //     chrome.storage.local.set({ data: JSON.stringify(bookmarks) })
-  //   }
-  //   onSave()
-  // }, [throttledValue])
+  useEffect(() => {
+    setTexts(notes[index].desc)
+  }, [notes])
 
-  const formats = ['header', 'bold', 'italic', 'underline', 'list', 'indent']
+  useEffect(() => {
+    const onSave = async () => {
+      const bookmarks = await fetchBookmarks()
+      bookmarks[vid].notes[index].desc = throttledValue
+      console.log(throttledValue)
+      chrome.storage.local.set({ data: JSON.stringify(bookmarks) })
+    }
+    onSave()
+  }, [throttledValue])
+
+  const formats = ['header', 'bold', 'italic', 'underline', 'list', 'indent', 'code-block']
   const modules = {
     toolbar: {
       container: `#toolbar-${vid}-${index}`
@@ -35,25 +41,21 @@ export const TextEditor: React.FC<TextProp> = ({ index, vid, content }) => {
   const handleOnFocus = () => {
     setShowToolbar(true)
   }
-  // const handleOnChange = (content: string, _delta, _source, editor) => {
-  //   const html = editor.getHTML()
-  //   if (html.replace(/<(.|\n)*?>/g, '').trim().length === 0) setTexts('')
-  //   else setTexts(html)
-  // }
-  const handleOnChange = async (e) => {
-    const value = e.target.value
-    console.log(value)
-
-    const bookmarks = await fetchBookmarks()
-    bookmarks[vid].notes[index].desc = value
-    console.log(value)
-    chrome.storage.local.set({ data: JSON.stringify(bookmarks) })
-    setTexts(value)
+  const handleOnChange = (content: string, _delta, _source, editor) =>  {
+    const html = editor.getHTML()
+    if (html.replace(/<(.|\n)*?>/g, '').trim().length === 0) setTexts('')
+    else setTexts(html)
+  }
+  const handleOnBlur = () => {
+    if (!toolbarFocus) {
+      setShowToolbar(false)
+    }
+  }
+  const handleOnKeyDown = (e: HTMLMouseEvent) => {
+    e.stopPropagation()
   }
   return (
-    <div className='text-background'>
-      <input type='text' onChange={handleOnChange} value={texts} />
-      {/* <div> {`show content: ${content} text: ${texts}`}</div>
+    <div className='text-background' onClick={(e) => handleOnKeyDown(e)}>
       <div className={showToolbar ? 'block' : 'hidden'}>
         <CustomToolbar id={`toolbar-${vid}-${index}`} />
       </div>
@@ -62,10 +64,10 @@ export const TextEditor: React.FC<TextProp> = ({ index, vid, content }) => {
         modules={modules}
         theme='snow'
         value={texts}
-        onBlur={() => setShowToolbar(false)}
         onFocus={handleOnFocus}
+        onBlur={handleOnBlur}
         onChange={handleOnChange}
-      ></ReactQuill> */}
+      ></ReactQuill>
     </div>
   )
 }

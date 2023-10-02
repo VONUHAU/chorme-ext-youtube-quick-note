@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            cursor: crosshair;
+        }
+
+        #capture-area {
+            border: 2px dashed white;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="startScreenshot()">Start Screenshot</button>
+    <p>
+      nChange(content, delta, source, editor) : Called back with the new contents of the editor after change. It will be passed the HTML contents of the editor, a delta object expressing the change, the source of the change, and finally a read-only proxy to editor accessors such as getHTML(). ⚠️ Do not use this delta object as value, as it will cause a loop. Use editor.getContents() instead. See Using Deltas for details.
+
+onChangeSelection(range, source, editor) : Called back with the new selected range, or null when unfocused. It will be passed the selection range, the source of the change, and finally a read-only proxy to editor accessors such as getBounds().
+
+onFocus(range, source, editor) : Called when the editor becomes focused. It will receive the new selection range.
+
+onBlur(previousRange, source, editor) : Called when the editor loses focus. It will receive the selection range it had right before losing focus.
+
+onKeyPress(event) : Called after a key has been pressed and released. : Note that, like its native counterpart, this won't be called for special keys such as shift or enter. If you need those, hook onto onKeyDown or onKeyUp.
+
+onKeyDown(event) : Called after a key has been pressed, but before it is released. : Note that, due to how Quill works, it's possible that you won't receive events for keys such as enter, backspace or delete. If that's the case, try hooking onto onKeyUp instead.
+    </p>
+    <div id="overlay">
+        <div id="capture-area"></div>
+    </div>
+
+    <script>
+      let isCapturing = false;
+      let startX, startY, endX, endY;
+
+      function startScreenshot() {
+          isCapturing = true;
+          document.getElementById('overlay').style.display = 'block';
+          document.getElementById('capture-area').style.border = '2px dashed white';
+      }
+
+      function stopScreenshot() {
+          isCapturing = false;
+          document.getElementById('overlay').style.display = 'none';
+          document.getElementById('capture-area').style.border = 'none';
+          captureAndDownload();
+      }
+
+      document.addEventListener('mousedown', (e) => {
+          if (isCapturing) {
+              startX = e.clientX;
+              startY = e.clientY;
+              document.getElementById('capture-area').style.left = startX + 'px';
+              document.getElementById('capture-area').style.top = startY + 'px';
+          }
+      });
+
+      document.addEventListener('mousemove', (e) => {
+          if (isCapturing) {
+              endX = e.clientX;
+              endY = e.clientY;
+              const width = endX - startX;
+              const height = endY - startY;
+
+              document.getElementById('capture-area').style.width = width + 'px';
+              document.getElementById('capture-area').style.height = height + 'px';
+          }
+      });
+
+      document.addEventListener('mouseup', (e) => {
+          if (isCapturing) {
+              stopScreenshot();
+          }
+      });
+
+      function captureAndDownload() {
+          const x = startX;
+          const y = startY;
+          const width = endX - startX;
+          const height = endY - startY;
+
+          html2canvas(document.body, {
+              x: x,
+              y: y,
+              width: width,
+              height: height,
+              allowTaint: false,
+              useCORS: true
+          }).then(function(canvas) {
+              const screenshotURL = canvas.toDataURL('image/png');
+              const link = document.createElement('a');
+              link.href = screenshotURL;
+              link.download = 'screenshot.png';
+              link.click();
+          });
+      }
+  </script>
+
+
+    <!-- Include OpenCV.js and Tesseract.js libraries as needed -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
+</html>

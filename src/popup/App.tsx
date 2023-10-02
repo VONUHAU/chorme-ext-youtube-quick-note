@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import Card from '../components/card.tsx'
+import { useState, useEffect, useRef } from 'react'
+import { Card } from '../components/card.tsx'
 import Toast from '../components/toast.tsx'
 import { getCurrentTab, fetchBookmarks } from '../../utils/index.ts'
 import { Item } from '../Interface/index.ts'
@@ -11,9 +11,10 @@ function App() {
   const [data, setData] = useState<any>([])
   const [mapData, setMapData] = useState<Item[]>([])
   const [toast, setToast] = useState<string>('')
+  const carRef = useRef([])
+
   // handle load data from chrome storage
   useEffect(() => {
-    // handleClearStorageData()
     const initData = async () => {
       const result = await Promise.allSettled([fetchBookmarks(), getCurrentTab()])
       const [storageData, tab] = result
@@ -51,7 +52,6 @@ function App() {
       setToast('Please go to the YouTube watch page to use the bookmark feature')
       return
     }
-
     chrome.tabs.sendMessage(tab.id!, { type, tab: JSON.stringify(tab) }, (response) => {
       if (!response) {
         setToast('Oops, something went wrong, please try again')
@@ -75,6 +75,21 @@ function App() {
   useEffect(() => {
     setMapData(data)
   }, [data])
+
+  const handleToggleAccordion = (index: number) => {
+    carRef.current.map((ele, key) => {
+      const cardDetail = ele.children[1]
+      if (key == index) {
+        if (cardDetail.classList.contains('card-open')) {
+          cardDetail.classList.remove('card-open')
+        } else {
+          cardDetail.classList.add('card-open')
+        }
+      } else {
+        cardDetail.classList.remove('card-open')
+      }
+    })
+  }
 
   return (
     <>
@@ -148,7 +163,13 @@ function App() {
 
         <section className='space-y-2'>
           {mapData.map((value: Item, key: number) => (
-            <Card key={key} {...value} setData={setData} />
+            <Card
+              key={key}
+              {...value}
+              setData={setData}
+              ref={(el) => (carRef.current[key] = el)}
+              handleToggle={() => handleToggleAccordion(key)}
+            />
           ))}
         </section>
       </div>
