@@ -46,6 +46,31 @@ function App() {
     })
   }
 
+  const handleExtractText = () => {
+    // Capture the selected area as an image
+    chrome.tabs.captureVisibleTab({ format: 'png' }, (screenshotUrl) => {
+      // Create an HTML5 Image object
+      const img = new Image()
+      // Load the screenshot URL into the Image object
+      img.src = screenshotUrl
+      // When the image is loaded, create a canvas and draw the cropped portion
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const context = canvas.getContext('2d')
+        // Set the canvas dimensions to match the cropped area
+        canvas.width = width
+        canvas.height = height
+        // Draw the cropped portion of the screenshot onto the canvas
+        context.drawImage(img, x, y, width, height, 0, 0, width, height)
+        // Convert the canvas to a data URL
+        const croppedScreenshotUrl = canvas.toDataURL('image/png')
+        const link = document.createElement('a')
+        link.href = croppedScreenshotUrl
+        link.download = 'screenshot.png'
+        link.click()
+      }
+    })
+  }
   const handleCapture = async (type: string) => {
     const tab = await getCurrentTab()
     if (!tab.url!.includes('youtube.com/watch')) {
@@ -53,6 +78,7 @@ function App() {
       return
     }
     chrome.tabs.sendMessage(tab.id!, { type, tab: JSON.stringify(tab) }, (response) => {
+      console.log(response)
       if (!response) {
         setToast('Oops, something went wrong, please try again')
         return

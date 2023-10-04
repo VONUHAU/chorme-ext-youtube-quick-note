@@ -20,7 +20,7 @@ const manifest: Manifest.WebExtensionManifest = {
     default_popup: 'src/popup/index.html'
   },
   host_permissions: ['https://*/*'],
-  permissions: ['scripting', 'activeTab', 'tabs', 'storage', 'unlimitedStorage'],
+  permissions: ['scripting', 'activeTab', 'tabs', 'storage', 'unlimitedStorage', 'debugger'],
   commands: {
     _execute_action: {
       suggested_key: {

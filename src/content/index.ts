@@ -3,14 +3,13 @@
 import { Item } from '../Interface'
 
 let isCapturing = false
-let startX, startY, endX, endY
-let captureImageData = ''
+let startX: number, startY: number, endX: number, endY: number
+const captureImageData = ''
 
 function stopScreenshot() {
   isCapturing = false
   document.getElementById('youtube-quick-note-overlay')?.remove()
   document.getElementById('youtube-quick-note-capture-area')?.remove()
-  captureImageData = captureAndExtractText()
 }
 
 document.addEventListener('mousedown', (e) => {
@@ -24,6 +23,7 @@ document.addEventListener('mousedown', (e) => {
 
 document.addEventListener('mousemove', (e) => {
   if (isCapturing) {
+    document.body.style.cursor = 'crosshair'
     endX = e.clientX
     endY = e.clientY
     const width = endX - startX
@@ -35,34 +35,10 @@ document.addEventListener('mousemove', (e) => {
 
 document.addEventListener('mouseup', (e) => {
   if (isCapturing) {
+    document.body.style.cursor = 'auto'
     stopScreenshot()
   }
 })
-
-async function captureAndExtractText() {
-  const x = startX
-  const y = startY
-  const width = endX - startX
-  const height = endY - startY
-
-  // Capture the selected area as an image
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-
-  const video = document.getElementsByTagName('video')
-
-  ctx.drawImage(video, x, y, width, height, 0, 0, width, height)
-
-  // Convert the canvas to a data URL
-  const imageDataUrl = canvas.toDataURL('image/png')
-  const link = document.createElement('a')
-  link.href = screenshotURL
-  link.download = 'screenshot.png'
-  link.click()
-  return imageDataUrl
-}
 
 function getYoutubeInfo() {
   const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
@@ -161,7 +137,6 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
     if (isExtract) {
       isCapturing = true
       addOverLayer()
-      console.log(captureImageData)
     }
 
     const result = handleAddBookmark({
@@ -172,7 +147,8 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
       url: tab.url,
       createdAt: new Date().toISOString()
     })
-    return { ...result, imageData: JSON.stringify(captureImageData) }
+    console.log(`${startX} ${startY} ${endX - startX} ${endY - startY}`)
+    return { ...result, rect: { left: 50, top: 80, width: 200, height: 200 } }
   }
 }
 const fetchBookmarks = async () => {

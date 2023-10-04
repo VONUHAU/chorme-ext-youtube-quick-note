@@ -28,7 +28,8 @@
     "activeTab",
     "tabs",
     "storage",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "debugger"
   ],
   "commands": {
     "_execute_action": {
