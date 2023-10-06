@@ -22,10 +22,18 @@ const manifest: Manifest.WebExtensionManifest = {
   host_permissions: ['https://*/*'],
   permissions: ['scripting', 'activeTab', 'tabs', 'storage', 'unlimitedStorage', 'debugger'],
   commands: {
+    'run-foo': {
+      suggested_key: {
+        default: 'Ctrl+E',
+        mac: 'Command+E'
+      },
+      description: 'Run "foo" on the current page.'
+    },
     _execute_action: {
       suggested_key: {
         default: 'Ctrl+B',
-        mac: 'Command+B'
+        mac: 'Command+B',
+        linux: 'Ctrl+B'
       }
     }
   },

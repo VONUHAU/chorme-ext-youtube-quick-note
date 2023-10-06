@@ -28,26 +28,36 @@
 //   }
 // })
 
+chrome.commands.onCommand.addListener((command) => {
+  console.log(`Command: ${command}`)
+})
+
 function playAtTime(time: number) {
   console.log('hello play at time')
-  document.addEventListener('DOMContentLoaded', function () {
-    const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
-    console.log(youtubePlayer)
+  try {
+    let youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
     youtubePlayer.currentTime = time
-  })
+    window.onload = () => {
+      if (!youtubePlayer) {
+        youtubePlayer = document.querySelector('.video-stream')
+        youtubePlayer.currentTime = time
+      }
+    }
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 chrome.runtime.onMessage.addListener(async function (request) {
-  console.log(request.openNewTab)
-  if (request.openNewTab) {
-    const data = JSON.parse(request.openNewTab)
-    const newTab = await chrome.tabs.create({ url: data.url })
+  if (request.type == 'PLAY') {
+    console.log('new tab is open')
+    const newTab = await chrome.tabs.create({ url: request.url })
     console.log(newTab)
     chrome.scripting
       .executeScript({
         target: { tabId: newTab.id! },
         func: playAtTime,
-        args: [data.time]
+        args: [request.time]
       })
       .then(() => console.log('script injected'))
   }

@@ -120,12 +120,12 @@ function App() {
   return (
     <>
       <div className='blur-bg'></div>
-      <div className='p-3 app dark h-full'>
+      <div className='p-3 app dark h-full overflow-y-[overlay]'>
         <div
           className={
             data.length > 0
-              ? 'relative top-0  transition-all ease-in-out'
-              : 'relative left-1/2 top-1/2 transition-all ease-in-out translate-y-[-50%] translate-x-[-50%]'
+              ? 'relative top-0  transition-all ease-in-out rotate-360 origin-[0%_0%]'
+              : 'relative left-1/2 top-1/2 transition-all ease-in-out rotate-0 translate-y-[-50%] translate-x-[-50%]'
           }
         >
           <div className={data.length > 0 ? 'flex items-center justify-center' : 'flex items-center justify-start'}>
@@ -176,7 +176,12 @@ function App() {
 
               {data.length <= 0 ? (
                 <button className=' w-6 opacity-90 rounded cursor-pointer'>
-                  <svg fill='#ffffff' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'>
+                  <svg
+                    fill='#ffffff'
+                    className='group-hover:fill-accent fill-background transition'
+                    xmlns='http://www.w3.org/2000/svg'
+                    viewBox='0 0 36 36'
+                  >
                     <path d='m31.89,33.39c1.94-2.78,1.27-6.6-1.51-8.54-1.21-.85-2.63-1.2-4-1.09h0c-2.06.16-4.19-.36-6.01-1.64-1.52-1.07-3.27-2.92-3.27-4.12s1.74-3.05,3.26-4.12c1.83-1.28,3.95-1.8,6.01-1.63h0c1.37.11,2.79-.24,4-1.09,2.77-1.94,3.45-5.77,1.51-8.54s-5.77-3.45-8.54-1.51c-1.21.85-2.03,2.06-2.39,3.39h0c-.55,1.99-1.77,3.81-3.59,5.09-1.97,1.38-4.3,1.88-6.51,1.58h0c-1.66-.23-3.41.15-4.9,1.19-3.12,2.19-3.88,6.49-1.7,9.61,1.54,2.19,4.12,3.22,6.6,2.88h0c2.21-.3,4.54.2,6.51,1.59,1.83,1.28,3.04,3.1,3.59,5.09h0c.37,1.33,1.18,2.54,2.39,3.39,2.77,1.94,6.6,1.27,8.54-1.51Z' />
                   </svg>
                 </button>

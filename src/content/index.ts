@@ -135,7 +135,6 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
     const vid = urlParameters.get('v')
     video.pause()
     if (isExtract) {
-      isCapturing = true
       addOverLayer()
     }
 
@@ -147,8 +146,8 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
       url: tab.url,
       createdAt: new Date().toISOString()
     })
-    console.log(`${startX} ${startY} ${endX - startX} ${endY - startY}`)
-    return { ...result, rect: { left: 50, top: 80, width: 200, height: 200 } }
+
+    return result
   }
 }
 const fetchBookmarks = async () => {
@@ -159,7 +158,12 @@ const fetchBookmarks = async () => {
   }
 }
 
-const handleAddBookmark = async (newBookmark: Item) => {
+type BookmarkProp = {
+  status: string
+  message: string
+  data: Item
+}
+const handleAddBookmark = async (newBookmark: Item): Promise<BookmarkProp> => {
   let bookmarks = await fetchBookmarks()
   if (!bookmarks) {
     bookmarks = {}
@@ -199,7 +203,7 @@ const handleAddBookmark = async (newBookmark: Item) => {
     cloneBookmark[vid].notes.splice(index, 1)
     cloneBookmark[vid].notes.unshift(newNote)
   }
-  console.log(index, cloneBookmark)
+
   response.data = cloneBookmark
   return new Promise((resolve) => {
     chrome.storage.local.set({ data: JSON.stringify(bookmarks) }, () => {
@@ -220,13 +224,13 @@ const clearLocalStorage = () => {
 }
 const handleResponse = async (sendResponse: (response: any) => void, tab: any, isExtract: boolean = false) => {
   const bookmarks = await handleScreenShot(tab, isExtract)
-  console.log(bookmarks)
   sendResponse(bookmarks)
 }
 
 ;(() => {
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     // Handle the message here
+
     if (message.type == 'BOOKMARK') {
       const tab = JSON.parse(message.tab)
       handleResponse(sendResponse, tab)
@@ -243,9 +247,10 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
     }
     if (message.type == 'PLAY') {
       removeOverlay() // remove over layer if it existed
-      console.log(`${getCurrentVid()} url: ${message.url} time: ${message.time}`)
       if (getCurrentVid() == message.vid) {
         playAtTine(message.time)
+      } else {
+        chrome.runtime.sendMessage(message)
       }
     }
   })

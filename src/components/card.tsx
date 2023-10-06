@@ -22,12 +22,14 @@ export const Card = forwardRef<Ref, Card>(
     const handlePlayAtTime = async (e: HTMLMouseEvent, time: number) => {
       e.stopPropagation()
       const tab = await getCurrentTab()
-      const response = await chrome.tabs.sendMessage(tab.id!, {
-        type: 'PLAY',
-        time,
-        url,
-        vid
-      })
+      const sharedLink = `${tab.url}&t=${time}`;
+      message.textContent = sharedLink
+      // const response = await chrome.tabs.sendMessage(tab.id!, {
+      //   type: 'PLAY',
+      //   time,
+      //   url,
+      //   vid
+      // })
     }
 
     const handleRemoveCard = async (e: HTMLMouseEvent) => {
