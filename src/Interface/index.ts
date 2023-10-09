@@ -11,6 +11,7 @@ export type Item = {
     }
   ]
   url?: string
+  search: string
   createdAt?: string
   isExpand?: boolean
   newCreated?: boolean

@@ -13,21 +13,22 @@ const manifest: Manifest.WebExtensionManifest = {
   content_scripts: [
     {
       js: ['src/content/index.js'],
+      css: ['content.css'],
       matches: ['<all_urls>']
     }
   ],
   action: {
     default_popup: 'src/popup/index.html'
   },
-  host_permissions: ['https://*/*'],
+  host_permissions: ['<all_urls>'],
   permissions: ['scripting', 'activeTab', 'tabs', 'storage', 'unlimitedStorage', 'debugger'],
   commands: {
-    'run-foo': {
+    'Quick bookmark': {
       suggested_key: {
         default: 'Ctrl+E',
         mac: 'Command+E'
       },
-      description: 'Run "foo" on the current page.'
+      description: 'Quick bookmark'
     },
     _execute_action: {
       suggested_key: {

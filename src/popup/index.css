@@ -141,7 +141,10 @@ button {
   outline: none;
   border: none;
 }
-
+/* color picker */
+.sketch-picker {
+  color: black;
+}
 @keyframes opening {
   0%{
     rotate: 0deg;

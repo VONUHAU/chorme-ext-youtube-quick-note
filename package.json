@@ -30,6 +30,7 @@
   "dependencies": {
     "chrome-types": "^0.1.231",
     "react": "^18.2.0",
+    "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "react-quill": "^2.0.0",
     "tesseract.js": "^5.0.0",

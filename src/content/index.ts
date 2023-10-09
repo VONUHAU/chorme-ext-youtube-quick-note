@@ -6,6 +6,242 @@ let isCapturing = false
 let startX: number, startY: number, endX: number, endY: number
 const captureImageData = ''
 
+function convertVietnameseToNormal(text: string) {
+  // Define a mapping of Vietnamese diacritical characters to their non-diacritical counterparts
+  const diacriticsMap = {
+    à: 'a',
+    á: 'a',
+    ả: 'a',
+    ã: 'a',
+    ạ: 'a',
+    â: 'a',
+    À: 'A',
+    Â: 'A',
+    Á: 'A',
+    Ả: 'A',
+    Ã: 'A',
+    Ạ: 'A',
+    è: 'e',
+    é: 'e',
+    ẻ: 'e',
+    ẽ: 'e',
+    ẹ: 'e',
+    È: 'E',
+    É: 'E',
+    Ẻ: 'E',
+    Ẽ: 'E',
+    Ẹ: 'E',
+    ì: 'i',
+    í: 'i',
+    ỉ: 'i',
+    ĩ: 'i',
+    ị: 'i',
+    Ì: 'I',
+    Í: 'I',
+    Ỉ: 'I',
+    Ĩ: 'I',
+    Ị: 'I',
+    ò: 'o',
+    ó: 'o',
+    ỏ: 'o',
+    ở: 'o',
+    õ: 'o',
+    ọ: 'o',
+    Ò: 'O',
+    Ó: 'O',
+    Ỏ: 'O',
+    Ở: 'O',
+    Õ: 'O',
+    Ọ: 'O',
+    ù: 'u',
+    ú: 'u',
+    ủ: 'u',
+    ũ: 'u',
+    ụ: 'u',
+    ư: 'u',
+    Ù: 'U',
+    Ú: 'U',
+    Ủ: 'U',
+    Ũ: 'U',
+    Ư: 'U',
+    Ụ: 'U',
+    ỳ: 'y',
+    ý: 'y',
+    ỷ: 'y',
+    ỹ: 'y',
+    ỵ: 'y',
+    Ỳ: 'Y',
+    Ý: 'Y',
+    Ỷ: 'Y',
+    Ỹ: 'Y',
+    Ỵ: 'Y',
+    đ: 'd',
+    Đ: 'D'
+  }
+
+  // Use a regular expression to match diacritics and replace them with their non-diacritical counterparts
+  return text.replace(
+    /[àáảãạÀÁẢÃẠèéẻẽẹÈÉẺẼẸìíỉĩịÌÍỈĨỊòóỏõọÒÓỎÕỌùúủũụÙÚỦŨỤỳýỷỹỵỲÝỶỸỴđĐ]/g,
+    (match: string) => diacriticsMap[match as keyof typeof diacriticsMap] || match
+  )
+}
+
+function convertDurationToTimeStamp(durationString) {
+  const parts = durationString.split(':').map(Number)
+
+  if (parts.length === 2) {
+    // Format: M:SS
+    return parts[0] * 60 + parts[1]
+  } else if (parts.length === 3) {
+    // Format: H:MM:SS
+    return parts[0] * 3600 + parts[1] * 60 + parts[2]
+  } else {
+    throw new Error('Invalid duration format. Please use "M:SS" or "H:MM:SS" format.')
+  }
+}
+
+async function addBookmarksOnTimeLine() {
+  // get is hidden bookmark setting
+  const getStorage = await chrome.storage.local.get(['hiddenBookmarks'])
+  console.log(getStorage.hiddenBookmarks)
+  if (getStorage.hiddenBookmarks == true) {
+    return
+  }
+
+  const vid = getCurrentVid()
+  if (!vid) return
+  const data = await fetchBookmarks()
+  if (!data) return
+  const notes = data[vid].notes
+  console.log(vid, data, notes)
+  if (!notes || notes.length < 1) return
+  const timelineELe = document.getElementsByClassName('ytp-progress-bar')[0]
+  // retry after 200ms if can't get the timeline element
+  let duration = document.getElementsByClassName('ytp-time-duration')[0].innerText
+  if (!timelineELe || !duration) {
+    setTimeout(() => {
+      addBookmarksOnTimeLine()
+    }, 200)
+  }
+  if (!duration) return
+  console.log(duration)
+  duration = convertDurationToTimeStamp(duration)
+  // get setting color
+  let color = '#59eb2c'
+  const settingColor = await chrome.storage.local.get(['bookmarkColor'])
+  console.log(settingColor.bookmarkColor)
+  if (settingColor || settingColor.bookmarkColor) {
+    const rgba = JSON.parse(settingColor.bookmarkColor)
+    color = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
+  }
+
+  timelineELe.style.position = 'relative'
+  const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
+  // create new bookmarks note child elements
+  for (const note of notes) {
+    const time = note.timeStamp
+    const childElement = document.createElement('div')
+    childElement.className = `bookmark-timeline v-${time}`
+    childElement.style.background = color
+    childElement.style.left = `${(time / duration) * 100}%`
+    childElement.addEventListener('onClick', () => {
+      youtubePlayer!.currentTime = time
+    })
+    // create hover content for for childEle
+    if (note.desc) {
+      const descEle = document.createElement('div')
+      descEle.className = `bookmark-timeline-content ${time}`
+      descEle.style.background = 'gray'
+      descEle.innerHTML = note.desc
+      childElement.appendChild(descEle)
+    }
+
+    timelineELe.appendChild(childElement)
+  }
+}
+// init bookmarks
+addBookmarksOnTimeLine()
+
+async function addBookmarkOnTimeLine(vid: string, note) {
+  // get is hidden bookmark setting
+  const getStorage = await chrome.storage.local.get(['hiddenBookmarks'])
+  console.log(getStorage.hiddenBookmarks)
+  if (getStorage.hiddenBookmarks == true) {
+    return
+  }
+
+  if (!vid || !note) return
+  const timelineELe = document.getElementsByClassName('ytp-progress-bar')[0]
+  // retry after 200ms if can't get the timeline or duration element
+  let duration = document.getElementsByClassName('ytp-time-duration')[0].innerText
+  if (!timelineELe || !duration) {
+    setTimeout(() => {
+      addBookmarkOnTimeLine(vid, note)
+    }, 200)
+  }
+  if (!duration) return
+  duration = convertDurationToTimeStamp(duration)
+  // get color setting
+  let color = '#59eb2c'
+  const settingColor = await chrome.storage.local.get(['bookmarkColor'])
+  if (settingColor || settingColor.bookmarkColor) {
+    const rgba = JSON.parse(settingColor.bookmarkColor)
+    color = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
+  }
+
+  timelineELe.style.position = 'relative'
+  const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
+  // create new bookmarks note child elements
+  const time = note.timeStamp
+  const childElement = document.createElement('div')
+  childElement.className = `bookmark-timeline v-${time}`
+  childElement.style.background = color
+  childElement.style.left = `${(time / duration) * 100}%`
+  childElement.addEventListener('onClick', () => {
+    youtubePlayer!.currentTime = time
+  })
+  // create hover content for for childEle
+  if (note.desc) {
+    const descEle = document.createElement('div')
+    descEle.className = `bookmark-timeline-content ${time}`
+    descEle.style.background = 'gray'
+    descEle.innerHTML = note.desc
+    childElement.appendChild(descEle)
+  }
+  timelineELe.appendChild(childElement)
+}
+
+async function updateNote(vid: string, time: string, desc: string) {
+  if (!vid || !desc) return
+  const bookmarkELes = document.getElementsByClassName(time)[0]
+  if (bookmarkELes) {
+    bookmarkELes.innerHTML = desc
+    return
+  }
+  const noteEle = document.getElementsByClassName(`v-${time}`)[0]
+  const descEle = document.createElement('div')
+  descEle.className = `bookmark-timeline-content ${time}`
+  descEle.style.background = 'gray'
+  descEle.innerHTML = desc
+  noteEle.appendChild(descEle)
+}
+
+async function updateUISetting() {
+
+}
+async function removeBookmark(time: string) {
+  console.log('hey remove')
+  document.getElementsByClassName(`v-${time}`)[0].remove()
+}
+async function removeBookmarks() {
+  console.log('hey remove all')
+  const bookmarkELes = document.querySelectorAll('.bookmark-timeline')
+  console.log(bookmarkELes)
+  for (const ele of bookmarkELes) {
+    ele.remove()
+  }
+}
+
 function stopScreenshot() {
   isCapturing = false
   document.getElementById('youtube-quick-note-overlay')?.remove()
@@ -56,27 +292,6 @@ function removeOverlay() {
   }
 }
 
-async function getCurrentTab() {
-  const queryOptions = { active: true, lastFocusedWindow: true }
-  const [tab] = await chrome.tabs.query(queryOptions)
-  return tab
-}
-
-function extractYouTubeVideoId(url) {
-  // Regular expression to match the video ID in the URL
-  const regex = /[?&]v=([^?&]+)/
-
-  // Use the regex to extract the video ID
-  const match = url.match(regex)
-
-  // If a match is found, return the video ID; otherwise, return null
-  if (match) {
-    return match[1]
-  } else {
-    return null
-  }
-}
-
 function getCurrentVid() {
   const url = window.location.href
   const regex = /[?&]v=([^?&]+)/
@@ -86,6 +301,7 @@ function getCurrentVid() {
   }
   return null
 }
+
 function formatTimeStamp(time: number) {
   const date = new Date(0)
   date.setSeconds(time)
@@ -136,25 +352,36 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
     video.pause()
     if (isExtract) {
       addOverLayer()
+      isCapturing = true
     }
-
+    const note = { id: Date.now(), desc: '', timeStamp: currentYoutubeInfo.timeStamp, attachment: '' }
     const result = handleAddBookmark({
       title: currentYoutubeInfo.title,
       tabID: tab.id,
       vid: vid!,
-      notes: [{ id: Date.now(), desc: '', timeStamp: currentYoutubeInfo.timeStamp, attachment: '' }],
+      notes: [note],
       url: tab.url,
+      search: convertVietnameseToNormal(currentYoutubeInfo.title),
       createdAt: new Date().toISOString()
     })
-
+    addBookmarkOnTimeLine(vid, note)
     return result
   }
 }
-const fetchBookmarks = async () => {
+async function fetchBookmarks() {
   const getStorage = await chrome.storage.local.get(['data'])
-  console.log(getStorage)
   if (getStorage && getStorage.data) {
     return JSON.parse(getStorage.data)
+  }
+}
+
+async function getStorageData(keyName: string, dataType = null) {
+  const getStorage = await chrome.storage.local.get([keyName])
+  if (getStorage && getStorage[keyName]) {
+    if (!dataType) {
+      return JSON.parse(getStorage[keyName])
+    }
+    return getStorage[keyName]
   }
 }
 
@@ -241,6 +468,24 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       handleResponse(sendResponse, tab, true)
       return true
     }
+    if (message.type == 'REMOVE_BOOKMARK') {
+      console.log(message.time)
+      removeBookmark(message.time)
+      return
+    }
+    if (message.type == 'REMOVE_ALL_BOOKMARK') {
+      removeBookmarks()
+      return
+    }
+    if (message.type == 'UPDATE_CONTENT_UI_SETTING') {
+      updateUISetting()
+      return
+    }
+    if (message.type == 'ADD_NOTE') {
+      updateNote(message.vid, message.time, message.desc)
+      return
+    }
+    
     if (message.type == 'OPEN_NEW_TAB') {
       window.open(message.url, '_blank')
       return true

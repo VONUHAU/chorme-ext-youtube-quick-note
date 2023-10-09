@@ -1,0 +1,34 @@
+.bookmark-timeline{
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  top: -3px;
+  z-index: 9999;
+}
+.bookmark-timeline{
+  transition: all cubic-bezier(0.075, 0.82, 0.165, 1) 300ms;
+}
+.bookmark-timeline:hover{
+  transform: scale(1.6)
+}
+.bookmark-timeline:hover .bookmark-timeline-content{
+  display: block;
+}
+.bookmark-timeline-content{
+  position: absolute;
+  top: 0;
+  left: 50%;
+  min-width: max-content;
+  max-height: 200px;
+  z-index: 9999;
+  padding: 5px;
+  translate: -50% -105%;
+  border-radius: 3%;
+  font-size: 8px;
+  display: none;
+  transition: all cubic-bezier(0.075, 0.82, 0.165, 1) 400ms;
+}
+.bookmark-timeline-content ul{
+  margin-left: 12px;
+}
