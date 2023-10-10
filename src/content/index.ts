@@ -103,7 +103,6 @@ function convertDurationToTimeStamp(durationString) {
 async function addBookmarksOnTimeLine() {
   // get is hidden bookmark setting
   const getStorage = await chrome.storage.local.get(['hiddenBookmarks'])
-  console.log(getStorage.hiddenBookmarks)
   if (getStorage.hiddenBookmarks == true) {
     return
   }
@@ -113,7 +112,6 @@ async function addBookmarksOnTimeLine() {
   const data = await fetchBookmarks()
   if (!data) return
   const notes = data[vid].notes
-  console.log(vid, data, notes)
   if (!notes || notes.length < 1) return
   const timelineELe = document.getElementsByClassName('ytp-progress-bar')[0]
   // retry after 200ms if can't get the timeline element
@@ -124,12 +122,10 @@ async function addBookmarksOnTimeLine() {
     }, 200)
   }
   if (!duration) return
-  console.log(duration)
   duration = convertDurationToTimeStamp(duration)
   // get setting color
   let color = '#59eb2c'
   const settingColor = await chrome.storage.local.get(['bookmarkColor'])
-  console.log(settingColor.bookmarkColor)
   if (settingColor || settingColor.bookmarkColor) {
     const rgba = JSON.parse(settingColor.bookmarkColor)
     color = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
@@ -226,17 +222,39 @@ async function updateNote(vid: string, time: string, desc: string) {
   noteEle.appendChild(descEle)
 }
 
-async function updateUISetting() {
-
+async function updateUISetting(updateDisplay?: boolean | null, updateColor?) {
+  //set color setting
+  if (updateColor) {
+    let color = '#59eb2c'
+    const rgba = updateColor
+    color = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
+    const bookmarkELes = document.querySelectorAll('.bookmark-timeline')
+    for (const ele of bookmarkELes) {
+      ele.style.background = color
+    }
+    return
+  }
+  // update display setting
+  const bookmarkELes = document.querySelectorAll('.bookmark-timeline')
+  if (updateDisplay == false) {
+    for (const ele of bookmarkELes) {
+      ele.style.display = 'block'
+    }
+    return
+  }
+  if (updateDisplay == true) {
+    for (const ele of bookmarkELes) {
+      ele.style.display = 'none'
+    }
+    return
+  }
 }
 async function removeBookmark(time: string) {
   console.log('hey remove')
   document.getElementsByClassName(`v-${time}`)[0].remove()
 }
 async function removeBookmarks() {
-  console.log('hey remove all')
   const bookmarkELes = document.querySelectorAll('.bookmark-timeline')
-  console.log(bookmarkELes)
   for (const ele of bookmarkELes) {
     ele.remove()
   }
@@ -477,15 +495,19 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       removeBookmarks()
       return
     }
-    if (message.type == 'UPDATE_CONTENT_UI_SETTING') {
-      updateUISetting()
+    if (message.type == 'UPDATE_DISPLAY_SETTING') {
+      updateUISetting(message.value)
+      return
+    }
+    if (message.type == 'UPDATE_COLOR_SETTING') {
+      updateUISetting(null, message.value)
       return
     }
     if (message.type == 'ADD_NOTE') {
       updateNote(message.vid, message.time, message.desc)
       return
     }
-    
+
     if (message.type == 'OPEN_NEW_TAB') {
       window.open(message.url, '_blank')
       return true

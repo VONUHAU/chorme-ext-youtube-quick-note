@@ -21,11 +21,11 @@ export const SettingModal: React.FC<ModalProp> = ({ setModalOpen }) => {
     getSetting()
   }, [])
 
-  const handleOnChange = async() => {
+  const handleOnChange = async () => {
     setIsChecked(!isChecked)
     const tab = await getCurrentTab()
     chrome.storage.local.set({ hiddenBookmarks: !isChecked })
-    chrome.tabs.sendMessage(tab.id!, { type: 'UPDATE_CONTENT_UI_SETTING' })
+    chrome.tabs.sendMessage(tab.id!, { type: 'UPDATE_DISPLAY_SETTING', value: !isChecked })
   }
   return (
     <div className='modal'>

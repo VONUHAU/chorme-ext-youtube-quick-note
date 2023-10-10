@@ -28,13 +28,15 @@ export const ColorPicker = () => {
 
   const handleClose = async () => {
     setDisplayColor(false)
-    const tab = await getCurrentTab()
     chrome.storage.local.set({ bookmarkColor: JSON.stringify(color) })
-    chrome.tabs.sendMessage(tab.id!, { type: 'UPDATE_CONTENT_UI_SETTING' })
+  }
+  const handleChangeComplete = async (value) => {
+    const tab = await getCurrentTab()
+    chrome.tabs.sendMessage(tab.id!, { type: 'UPDATE_COLOR_SETTING', value: value.rgb })
   }
 
-  const handleChange = (color) => {
-    setColor(color.rgb)
+  const handleChange = (value) => {
+    setColor(value.rgb)
   }
 
   return (
@@ -50,7 +52,13 @@ export const ColorPicker = () => {
       {displayColor ? (
         <div className='absolute top-[-80px]'>
           <div className='fixed inset-0 text-text' onClick={handleClose} />
-          <SketchPicker width={180} color={color} onChange={handleChange} presetColors={[]} />
+          <SketchPicker
+            width={180}
+            color={color}
+            onChangeComplete={handleChangeComplete}
+            onChange={handleChange}
+            presetColors={[]}
+          />
         </div>
       ) : null}
     </>
