@@ -15,11 +15,16 @@
 .bookmark-timeline:hover .bookmark-timeline-content{
   display: block;
 }
+.bookmark-timeline:hover .ytp-preview{
+  display: none !important;
+}
+
 .bookmark-timeline-content{
   position: absolute;
   top: 0;
   left: 50%;
-  min-width: max-content;
+  min-width: 80px;
+  max-width: 200px;
   max-height: 200px;
   z-index: 9999;
   padding: 5px;

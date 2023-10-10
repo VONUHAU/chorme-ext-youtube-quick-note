@@ -143,11 +143,17 @@ async function addBookmarksOnTimeLine() {
     childElement.addEventListener('onClick', () => {
       youtubePlayer!.currentTime = time
     })
+    // set preview element youtube is false when hover on bookmark note in order to show clearly the note
+    childElement.addEventListener('mouseover', () => {
+      const previewELe = document.getElementsByClassName('ytp-tooltip ytp-bottom ytp-rounded-tooltip ytp-preview')[0]
+      if (!previewELe) return
+      previewELe.style.display = 'none'
+    })
     // create hover content for for childEle
     if (note.desc) {
       const descEle = document.createElement('div')
       descEle.className = `bookmark-timeline-content ${time}`
-      descEle.style.background = 'gray'
+      descEle.style.background = '#435167'
       descEle.innerHTML = note.desc
       childElement.appendChild(descEle)
     }
@@ -196,11 +202,17 @@ async function addBookmarkOnTimeLine(vid: string, note) {
   childElement.addEventListener('onClick', () => {
     youtubePlayer!.currentTime = time
   })
+  // set preview element youtube is false when hover on bookmark note in order to show clearly the note
+  childElement.addEventListener('mouseover', () => {
+    const previewELe = document.getElementsByClassName('ytp-tooltip ytp-bottom ytp-rounded-tooltip ytp-preview')[0]
+    if (!previewELe) return
+    previewELe.style.display = 'none'
+  })
   // create hover content for for childEle
   if (note.desc) {
     const descEle = document.createElement('div')
     descEle.className = `bookmark-timeline-content ${time}`
-    descEle.style.background = 'gray'
+    descEle.style.background = '#435167'
     descEle.innerHTML = note.desc
     childElement.appendChild(descEle)
   }
@@ -217,7 +229,6 @@ async function updateNote(vid: string, time: string, desc: string) {
   const noteEle = document.getElementsByClassName(`v-${time}`)[0]
   const descEle = document.createElement('div')
   descEle.className = `bookmark-timeline-content ${time}`
-  descEle.style.background = 'gray'
   descEle.innerHTML = desc
   noteEle.appendChild(descEle)
 }
@@ -510,6 +521,10 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
 
     if (message.type == 'OPEN_NEW_TAB') {
       window.open(message.url, '_blank')
+      return true
+    }
+    if (message.type == 'TAB_UPDATE') {
+      addBookmarksOnTimeLine()
       return true
     }
     if (message.type == 'PLAY') {

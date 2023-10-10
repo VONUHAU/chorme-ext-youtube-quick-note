@@ -62,6 +62,7 @@ export const TextEditor: React.FC<TextProp> = ({ index, vid, notes, time }) => {
   const handleOnKeyDown = (e: HTMLMouseEvent) => {
     e.stopPropagation()
   }
+
   return (
     <div className='text-background' onClick={(e) => handleOnKeyDown(e)}>
       <div className={showToolbar ? 'block' : 'hidden'}>
