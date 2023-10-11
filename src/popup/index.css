@@ -141,6 +141,16 @@ button {
   outline: none;
   border: none;
 }
+
+.title:has(svg:hover) {
+  color: var(--accent);
+  text-decoration: underline;
+  transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 300ms;
+}
+.timer:hover .timer-icon{
+  fill: var(--accent);
+  transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 300ms;
+}
 /* color picker */
 .sketch-picker {
   color: black;

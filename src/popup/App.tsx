@@ -21,9 +21,9 @@ function App() {
       const result = await Promise.allSettled([fetchBookmarks(), getCurrentTab()])
       const [storageData, tab] = result
       const obj = storageData.value
+      if (!obj) return
       let currentItem = null
       if (tab.value) {
-        console.log(tab.value)
         const queryParameters = tab.value.url.split('?')[1]
         const urlParameters = new URLSearchParams(queryParameters)
         const vid = urlParameters.get('v')
@@ -32,8 +32,7 @@ function App() {
           delete obj[vid]
         }
       }
-      let bookmarks: Item[] = Object.values(obj)
-      bookmarks = bookmarks.sort((a: Item, b: Item) => new Date(b.createdAt) - new Date(a.createdAt))
+      const bookmarks: Item[] = Object.values(obj)
       if (currentItem) {
         currentItem.isExpand = true
         bookmarks.unshift(currentItem)
@@ -43,10 +42,12 @@ function App() {
     initData()
   }, [])
 
-  const handleClearStorageData = () => {
-    chrome.storage.local.clear(() => {
-      setData([])
-    })
+  const handleClearStorageData = async () => {
+    //move the current data to the old data filed in order user can recover their data if unindent press clear data button
+    const currentData = await chrome.storage.local.get(['data'])
+    chrome.storage.local.set({ oldData: currentData.data })
+    chrome.storage.local.set({ data: null })
+    setData([])
   }
 
   const handleExtractText = () => {
@@ -199,7 +200,7 @@ function App() {
                   modalOpen ? 'block' : 'hidden'
                 } modal-overlay fixed z-10 bg-black bg-opacity-40 top-0 left-0 w-full h-full`}
               ></div>
-              {modalOpen ? <SettingModal setModalOpen={setModalOpen}/> : null}
+              {modalOpen ? <SettingModal setModalOpen={setModalOpen} setData={setData}/> : null}
               {data.length > 0 ? (
                 <button
                   onClick={handleClearStorageData}

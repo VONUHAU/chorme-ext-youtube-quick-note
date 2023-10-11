@@ -61,20 +61,23 @@ export const Note: React.FC<Note> = ({ newCreated, vid, url, notes, value, setDa
 
   return (
     <div className='bookmark rounded p-2'>
-      <div
-        className='timestamp flex gap-2 mb-1 group hover:text-accent font-medium text-background italic cursor-pointer'
-        onClick={(e) => handlePlayAtTime(e, timeStamp)}
-      >
+      <div className='timestamp flex gap-2 mb-1 hover:text-accent font-medium text-background italic'>
         <svg
           width={16}
           height={16}
-          className='group-hover:fill-accent fill-white'
+          className='timer-icon fill-white'
           xmlns='http://www.w3.org/2000/svg'
           viewBox='0 0 36 36'
         >
           <path d='M18,0A18,18,0,1,0,36,18,18,18,0,0,0,18,0Zm0,32.4A14.4,14.4,0,1,1,32.4,18,14.4,14.4,0,0,1,18,32.4Z' />
           <path d='M23.4,17.4H18.6v-6a1.8,1.8,0,0,0-3.6,0v6A3.6,3.6,0,0,0,18.6,21h4.8a1.8,1.8,0,0,0,0-3.6Z' />
         </svg>
+        <span
+          className='timer hover:fill-accent transition-all duration-75 ease-in-out cursor-pointer'
+          onClick={(e) => handlePlayAtTime(e, timeStamp)}
+        >
+          {formatTimeStamp(timeStamp)}
+        </span>
       </div>
       {showEditor ? <TextEditor index={index} vid={vid} notes={notes} time={timeStamp} /> : null}
 

@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { detect } from 'tesseract.js'
 import { Item } from '../Interface'
-
-let isCapturing = false
-let startX: number, startY: number, endX: number, endY: number
-const captureImageData = ''
 
 function convertVietnameseToNormal(text: string) {
   // Define a mapping of Vietnamese diacritical characters to their non-diacritical counterparts
@@ -86,20 +81,27 @@ function convertVietnameseToNormal(text: string) {
     (match: string) => diacriticsMap[match as keyof typeof diacriticsMap] || match
   )
 }
-// detect and remove youtube ads
+
+//handle remove ads
+function handleRemoveAds() {
+  const skipButtonEle = document.getElementsByClassName('ytp-ad-skip-button ytp-button')[0]
+  if (skipButtonEle) {
+    console.log('Ad detected')
+    skipButtonEle.click()
+    addBookmarksOnTimeLine()
+  }
+}
+
+// init remove ads function
 function removeAds() {
+  handleRemoveAds()
   setInterval(() => {
-    const skipButtonEle = document.getElementsByClassName('ytb-ad-skip-button')[0]
-    if (skipButtonEle) {
-      console.log('Ad detected')
-      skipButtonEle.click()
-      addBookmarksOnTimeLine()
-    }
+    handleRemoveAds()
   }, 3000)
 }
 removeAds()
-//clear bookmarks
-function convertDurationToTimeStamp(durationString) {
+
+function convertDurationToTimeStamp(durationString: string) {
   const parts = durationString.split(':').map(Number)
 
   if (parts.length === 2) {
@@ -141,7 +143,7 @@ async function addBookmarksOnTimeLine() {
   // get setting color
   let color = '#59eb2c'
   const settingColor = await chrome.storage.local.get(['bookmarkColor'])
-  if (settingColor || settingColor.bookmarkColor) {
+  if (settingColor && settingColor.bookmarkColor) {
     const rgba = JSON.parse(settingColor.bookmarkColor)
     color = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
   }
@@ -201,7 +203,7 @@ async function addBookmarkOnTimeLine(vid: string, note) {
   // get color setting
   let color = '#59eb2c'
   const settingColor = await chrome.storage.local.get(['bookmarkColor'])
-  if (settingColor || settingColor.bookmarkColor) {
+  if (settingColor && settingColor.bookmarkColor) {
     const rgba = JSON.parse(settingColor.bookmarkColor)
     color = `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
   }
@@ -286,40 +288,6 @@ async function removeBookmarks() {
   }
 }
 
-function stopScreenshot() {
-  isCapturing = false
-  document.getElementById('youtube-quick-note-overlay')?.remove()
-  document.getElementById('youtube-quick-note-capture-area')?.remove()
-}
-
-document.addEventListener('mousedown', (e) => {
-  if (isCapturing) {
-    startX = e.clientX
-    startY = e.clientY
-    document.getElementById('youtube-quick-note-capture-area')!.style.left = startX + 'px'
-    document.getElementById('youtube-quick-note-capture-area')!.style.top = startY + 'px'
-  }
-})
-
-document.addEventListener('mousemove', (e) => {
-  if (isCapturing) {
-    document.body.style.cursor = 'crosshair'
-    endX = e.clientX
-    endY = e.clientY
-    const width = endX - startX
-    const height = endY - startY
-    document.getElementById('youtube-quick-note-capture-area')!.style.width = width + 'px'
-    document.getElementById('youtube-quick-note-capture-area')!.style.height = height + 'px'
-  }
-})
-
-document.addEventListener('mouseup', (e) => {
-  if (isCapturing) {
-    document.body.style.cursor = 'auto'
-    stopScreenshot()
-  }
-})
-
 function getYoutubeInfo() {
   const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
   const titleEle = document.querySelector('#title h1.style-scope.ytd-watch-metadata .style-scope.ytd-watch-metadata')
@@ -396,7 +364,6 @@ async function handleScreenShot(tab: any, isExtract?: boolean) {
     video.pause()
     if (isExtract) {
       addOverLayer()
-      isCapturing = true
     }
     const note = { id: Date.now(), desc: '', timeStamp: currentYoutubeInfo.timeStamp, attachment: '' }
     const result = handleAddBookmark({
@@ -488,11 +455,6 @@ const playAtTine = (time: number) => {
   youtubePlayer.currentTime = time
 }
 
-const clearLocalStorage = () => {
-  chrome.storage.local.clear(() => {
-    console.log('cleared all')
-  })
-}
 const handleResponse = async (sendResponse: (response: any) => void, tab: any, isExtract: boolean = false) => {
   const bookmarks = await handleScreenShot(tab, isExtract)
   sendResponse(bookmarks)
