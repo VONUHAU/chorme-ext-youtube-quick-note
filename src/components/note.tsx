@@ -75,7 +75,6 @@ export const Note: React.FC<Note> = ({ newCreated, vid, url, notes, value, setDa
           <path d='M18,0A18,18,0,1,0,36,18,18,18,0,0,0,18,0Zm0,32.4A14.4,14.4,0,1,1,32.4,18,14.4,14.4,0,0,1,18,32.4Z' />
           <path d='M23.4,17.4H18.6v-6a1.8,1.8,0,0,0-3.6,0v6A3.6,3.6,0,0,0,18.6,21h4.8a1.8,1.8,0,0,0,0-3.6Z' />
         </svg>
-        {newCreated && index == 0 ? "true" : "false"}  {showEditor ? "show edit true" : "show edit false"} {formatTimeStamp(timeStamp)}
       </div>
       {showEditor ? <TextEditor index={index} vid={vid} notes={notes} time={timeStamp} /> : null}
 

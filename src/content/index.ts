@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { detect } from 'tesseract.js'
 import { Item } from '../Interface'
 
 let isCapturing = false
@@ -85,7 +86,19 @@ function convertVietnameseToNormal(text: string) {
     (match: string) => diacriticsMap[match as keyof typeof diacriticsMap] || match
   )
 }
-
+// detect and remove youtube ads
+function removeAds() {
+  setInterval(() => {
+    const skipButtonEle = document.getElementsByClassName('ytb-ad-skip-button')[0]
+    if (skipButtonEle) {
+      console.log('Ad detected')
+      skipButtonEle.click()
+      addBookmarksOnTimeLine()
+    }
+  }, 3000)
+}
+removeAds()
+//clear bookmarks
 function convertDurationToTimeStamp(durationString) {
   const parts = durationString.split(':').map(Number)
 
@@ -111,7 +124,9 @@ async function addBookmarksOnTimeLine() {
   if (!vid) return
   const data = await fetchBookmarks()
   if (!data) return
-  const notes = data[vid].notes
+  // clear the bookmark of previous tab when update to new the new tab
+  removeBookmarks()
+  const notes = data[vid]?.notes
   if (!notes || notes.length < 1) return
   const timelineELe = document.getElementsByClassName('ytp-progress-bar')[0]
   // retry after 200ms if can't get the timeline element
