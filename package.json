@@ -1,9 +1,9 @@
 {
-  "name": "youtube-ext",
-  "displayName": "youtube-ext",
-  "description": "A untilitiy tool for take not youtube note",
+  "name": "quick-note-youtube-pro",
+  "displayName": "QuickNote YouTube Pro",
+  "description": "Simplify YouTube with quick bookmarks, notes, custom colors, and ad-blocking. Elevate your experience today!",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

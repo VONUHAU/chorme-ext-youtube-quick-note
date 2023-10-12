@@ -64,7 +64,7 @@ body {
   border-radius: 9999px;
   background-color: #f54ae5;
   top: 20%;
-  animation: moving 14s alternate infinite;
+  animation: moving 12s alternate infinite;
 }
 
 .card-detail{
@@ -85,7 +85,7 @@ body {
   background-color: #2083f9;
   top: 80%;
   left: 20%;
-  animation: moving2 16s alternate infinite;
+  animation: moving2 14s alternate infinite;
 }
 
 .toast{

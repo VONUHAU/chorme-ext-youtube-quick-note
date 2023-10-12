@@ -5,9 +5,10 @@ import { Item } from '../Interface'
 type ModalProp = {
   setModalOpen: Dispatch<SetStateAction<boolean>>
   setData: Dispatch<SetStateAction<Item[]>>
+  setMessage: Dispatch<SetStateAction<string>>
 }
 
-export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData }) => {
+export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData, setMessage }) => {
   const [isChecked, setIsChecked] = useState(false)
 
   // get isHidden bookmarks setting
@@ -34,6 +35,7 @@ export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData }) => 
     const currentData = await chrome.storage.local.get(['data'])
     let data = null
     if (!recoverData || !recoverData.oldData) {
+      setMessage('There is no previous data available for recovery')
       return
     }
     if (currentData && currentData?.data) {
@@ -65,7 +67,7 @@ export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData }) => 
               <path d='m18.99,19.48l4.77,2.31c.27.11.49.19.76.19.64,0,1.29-.38,1.59-.99.42-.87.08-1.93-.8-2.35l-3.79-1.86-.11-6.29c0-.95-.8-1.74-1.78-1.71-.95,0-1.74.8-1.71,1.78l.11,7.39c0,.61.38,1.21.95,1.52Z' />
             </svg>
           </button>
-          <div className='ml-3 text-sm text-background'>Recover Bookmarks</div>
+          <div className='ml-3 leading-4 text-sm text-background'>Restore previous bookmarks</div>
         </div>
         <div className='absolute right-4 bottom-4'>
           <button

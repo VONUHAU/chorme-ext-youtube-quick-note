@@ -14,7 +14,8 @@ export const ColorPicker = () => {
   // fetch color form google storage
   useEffect(() => {
     const getSettingColor = async () => {
-      const getStorage = await chrome.storage.local.get(['bookmarkColor'])
+      const getStorage = await chrome.storage.sync.get(['bookmarkColor'])
+      console.log(getStorage.bookmarkColor)
       if (getStorage && getStorage.bookmarkColor) {
         setColor(JSON.parse(getStorage.bookmarkColor))
       }
@@ -28,7 +29,7 @@ export const ColorPicker = () => {
 
   const handleClose = async () => {
     setDisplayColor(false)
-    chrome.storage.local.set({ bookmarkColor: JSON.stringify(color) })
+    chrome.storage.sync.set({ bookmarkColor: JSON.stringify(color) })
   }
   const handleChangeComplete = async (value) => {
     const tab = await getCurrentTab()

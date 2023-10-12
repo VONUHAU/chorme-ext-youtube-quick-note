@@ -32,14 +32,10 @@ export const Card = forwardRef<Ref, Card>(
 
     const handleOpenNewTab = async () => {
       const tab = await getCurrentTab()
-      if (accordion) {
-        chrome.tabs.sendMessage(tab.id!, {
-          type: 'OPEN_NEW_TAB',
-          url
-        })
-      } else {
-        setAccordion(true)
-      }
+      chrome.tabs.sendMessage(tab.id!, {
+        type: 'OPEN_NEW_TAB',
+        url
+      })
     }
 
     return (
@@ -49,12 +45,12 @@ export const Card = forwardRef<Ref, Card>(
             {title}
             {
               <svg
-                className={`peer inline ml-2 w-4 h-4 fill-background cursor-pointer transition-all duration-75 ease-in-out hover:fill-accent`}
+                className={`peer -translate-y-px inline ml-2 w-4 h-4 fill-background cursor-pointer transition-all duration-75 ease-in-out hover:fill-accent`}
                 xmlns='http://www.w3.org/2000/svg'
                 viewBox='0 0 36 36'
                 onClick={handleOpenNewTab}
               >
-                <path d='m35.09.91c-.59-.59-1.36-.91-2.18-.91-.38,0-.76.07-1.13.22L2.02,12.04C.83,12.48.03,13.65.03,14.95s.81,2.43,2.02,2.87l11.8,4.36,4.36,11.8c.43,1.16,1.53,1.95,2.87,2.02h.03c1.3,0,2.43-.78,2.86-1.96l11.81-29.84c.43-1.1.18-2.35-.69-3.29Zm-13.9,23.37l-2.07-5.6c-.33-.86-1-1.52-1.82-1.81l-5.59-2.07,15.71-6.22-6.23,15.7Z' />
+                <path d='M34.41.58a1.8,1.8,0,0,1,1,2.34L22.83,34.42a1.81,1.81,0,0,1-1.67,1.13H21a1.8,1.8,0,0,1-1.62-1.35L16,20.05,1.84,16.62l0,0A1.82,1.82,0,0,1,.58,15.5a1.79,1.79,0,0,1,1-2.33L33.08.58A1.8,1.8,0,0,1,34.41.58Z' />
               </svg>
             }
           </h4>

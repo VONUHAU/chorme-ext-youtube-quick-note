@@ -1,14 +1,21 @@
-
-// chrome.runtime.onInstalled.addListener(() => {
-//   chrome.action.setBadgeText({
-//     text: 'OFF'
-//   })
+import { getCurrentTab } from '../../utils'
+// chrome.runtime.onInstalled.addListener(function (details) {
+//   try {
+//     const thisVersion = chrome.runtime.getManifest().version
+//     if (details.reason == 'install') {
+//       console.info('First version installed')
+//       //Send message to popup.html and notify/alert user("Welcome")
+//     } else if (details.reason == 'update') {
+//       console.info('Updated version: ' + thisVersion)
+//       //Send message to popup.html and notify/alert user
+//       chrome.runtime.sendMessage({ name: 'showPopupOnUpdated', version: thisVersion })
+//     }
+//   } catch (e) {
+//     console.info('OnInstall Error - ' + e)
+//   }
 // })
 
-import { getCurrentTab } from "../../utils"
-
 // // when update youtube watch tab
-
 const youtubeUrl = 'youtube.com/watch'
 chrome.tabs.onUpdated.addListener(async (tabId, _changeInfo, tab) => {
   console.log(tabId, tab.id)
@@ -26,7 +33,7 @@ chrome.commands.onCommand.addListener(async (command) => {
     if (!tab.url!.includes('youtube.com/watch')) {
       return
     }
-    chrome.tabs.sendMessage(tab.id!, {type: 'BOOKMARK',tab: JSON.stringify(tab)})
+    chrome.tabs.sendMessage(tab.id!, { type: 'BOOKMARK', tab: JSON.stringify(tab) })
   }
 })
 

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "youtube-ext",
-  "version": "0.0.0",
-  "description": "A untilitiy tool for take not youtube note",
+  "name": "QuickNote YouTube Pro",
+  "version": "1.0.0",
+  "description": "Simplify YouTube with quick bookmarks, notes, custom colors, and ad-blocking. Elevate your experience today!",
   "background": {
     "service_worker": "src/background/index.js",
     "type": "module"
@@ -28,11 +28,8 @@
   ],
   "permissions": [
     "scripting",
-    "activeTab",
     "tabs",
-    "storage",
-    "unlimitedStorage",
-    "debugger"
+    "storage"
   ],
   "commands": {
     "Quick bookmark": {

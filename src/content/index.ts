@@ -184,7 +184,6 @@ addBookmarksOnTimeLine()
 async function addBookmarkOnTimeLine(vid: string, note) {
   // get is hidden bookmark setting
   const getStorage = await chrome.storage.local.get(['hiddenBookmarks'])
-  console.log(getStorage.hiddenBookmarks)
   if (getStorage.hiddenBookmarks == true) {
     return
   }
@@ -278,7 +277,6 @@ async function updateUISetting(updateDisplay?: boolean | null, updateColor?) {
   }
 }
 async function removeBookmark(time: string) {
-  console.log('hey remove')
   document.getElementsByClassName(`v-${time}`)[0].remove()
 }
 async function removeBookmarks() {
@@ -475,7 +473,6 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       return true
     }
     if (message.type == 'REMOVE_BOOKMARK') {
-      console.log(message.time)
       removeBookmark(message.time)
       return
     }

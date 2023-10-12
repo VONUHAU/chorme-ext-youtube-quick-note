@@ -11,6 +11,7 @@ export const getCurrentTab = async () => {
 
 export const fetchBookmarks = async () => {
   const getStorage = await chrome.storage.local.get(['data'])
+  console.log(getStorage.data)
   if (getStorage && getStorage.data) {
     return JSON.parse(getStorage.data)
   }

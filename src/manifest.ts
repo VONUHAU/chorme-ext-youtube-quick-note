@@ -21,7 +21,7 @@ const manifest: Manifest.WebExtensionManifest = {
     default_popup: 'src/popup/index.html'
   },
   host_permissions: ['<all_urls>'],
-  permissions: ['scripting', 'activeTab', 'tabs', 'storage', 'unlimitedStorage', 'debugger'],
+  permissions: ['scripting', 'tabs', 'storage'],
   commands: {
     'Quick bookmark': {
       suggested_key: {
