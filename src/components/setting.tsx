@@ -10,7 +10,12 @@ type ModalProp = {
 
 export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData, setMessage }) => {
   const [isChecked, setIsChecked] = useState(false)
-
+  const [color, setColor] = useState({
+    r: '89',
+    g: '235',
+    b: '44',
+    a: '1'
+  })
   // get isHidden bookmarks setting
   useEffect(() => {
     const getSetting = async () => {
@@ -47,6 +52,12 @@ export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData, setMe
     setData(bookmarks)
     setModalOpen(false)
   }
+
+  const handleClose = () => {
+    chrome.storage.local.set({ bookmarkColor: JSON.stringify(color) })
+    setModalOpen(false)
+  }
+
   return (
     <div className='modal'>
       <div className='fixed z-[99] top-1/2 rounded-lg py-2 px-4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-52 bg-[#2a243b]'>
@@ -57,7 +68,7 @@ export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData, setMe
           <span className='ml-3 text-sm text-background'>Hide bookmarks</span>
         </label>
         <div className='flex justify-start gap-4 items-center my-1'>
-          <ColorPicker />
+          <ColorPicker color={color} setColor={setColor} />
           <div className='ml-3 text-sm text-background'>Bookmark color</div>
         </div>
         <div className='flex justify-start gap-[1.12rem] items-center'>
@@ -72,7 +83,7 @@ export const SettingModal: React.FC<ModalProp> = ({ setModalOpen, setData, setMe
         <div className='absolute right-4 bottom-4'>
           <button
             className='hover:ring-2 hover:ring-purple-300 focus:ring-2 focus:ring-purple-300 text-background leading-5 bg-accent text-center outline-none px-3.5 py-1.5 rounded-full'
-            onClick={() => setModalOpen(false)}
+            onClick={handleClose}
           >
             Close
           </button>

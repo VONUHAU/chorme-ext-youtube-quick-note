@@ -51,7 +51,7 @@ export const Note: React.FC<Note> = ({ newCreated, vid, url, notes, value, setDa
   const handlePlayAtTime = async (e: HTMLMouseEvent, time: number) => {
     e.stopPropagation()
     const tab = await getCurrentTab()
-    const response = await chrome.tabs.sendMessage(tab.id!, {
+    await chrome.tabs.sendMessage(tab.id!, {
       type: 'PLAY',
       time,
       url,
@@ -60,7 +60,7 @@ export const Note: React.FC<Note> = ({ newCreated, vid, url, notes, value, setDa
   }
 
   return (
-    <div className='bookmark rounded p-2'>
+    <div className='bookmark rounded p-2' onClick={(e) => e.stopPropagation()}>
       <div className='timestamp flex gap-2 mb-1 hover:text-accent font-medium text-background italic'>
         <svg
           width={16}

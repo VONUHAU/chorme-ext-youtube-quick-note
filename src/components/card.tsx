@@ -31,8 +31,7 @@ export const Card = forwardRef<Ref, Card>(
     }
 
     const handleOpenNewTab = async () => {
-      const tab = await getCurrentTab()
-      chrome.tabs.sendMessage(tab.id!, {
+      chrome.runtime.sendMessage({
         type: 'OPEN_NEW_TAB',
         url
       })
@@ -70,7 +69,7 @@ export const Card = forwardRef<Ref, Card>(
         </div>
         <div className='flex justify-end mt-2'>
           <button
-            className='w-4 h-1 relative cursor-pointer after:bg-background before:bg-background after:transition-all before:opacity-90 after:opacity-90 before:transition-all after:ease-in-out
+            className='w-4 h-1 relative cursor-pointer after:bg-background before:bg-background after:transition-all after:duration-100 before:duration-100 before:opacity-90 after:opacity-90 before:transition-all after:ease-in-out
           before:ease-in-out hover:before:rotate-45 hover:after:rotate-[-45deg] after:content-[""] after:absolute after:inset-0 before:inset-0 after:rounded-full
           before:rounded-full after:w-full after:h-full before:content-[""] before:absolute before:w-full before:h-full'
             onClick={(e) => handleRemoveCard(e)}

@@ -11,21 +11,45 @@ function convertVietnameseToNormal(text: string) {
     ã: 'a',
     ạ: 'a',
     â: 'a',
+    ấ: 'a',
+    ậ: 'a',
+    ầ: 'a',
+    ẩ: 'a',
+    ă: 'a',
+    ắ: 'a',
+    ặ: 'a',
+    ẳ: 'a',
+    ằ: 'a',
     À: 'A',
     Â: 'A',
     Á: 'A',
     Ả: 'A',
     Ã: 'A',
     Ạ: 'A',
+    Ă: 'A',
+    Ẳ: 'A',
+    Ắ: 'A',
+    Ặ: 'A',
+    Ằ: 'A',
+    Ậ: 'A',
+    Ấ: 'A',
+    Ầ: 'A',
+    Ẩ: 'A',
     è: 'e',
     é: 'e',
+    ế: 'e',
     ẻ: 'e',
     ẽ: 'e',
+    ể: 'e',
+    ệ: 'e',
     ẹ: 'e',
     È: 'E',
     É: 'E',
     Ẻ: 'E',
     Ẽ: 'E',
+    Ế: 'E',
+    Ệ: 'E',
+    Ể: 'E',
     Ẹ: 'E',
     ì: 'i',
     í: 'i',
@@ -37,30 +61,44 @@ function convertVietnameseToNormal(text: string) {
     Ỉ: 'I',
     Ĩ: 'I',
     Ị: 'I',
+    ổ: 'o',
+    ờ: 'o',
     ò: 'o',
     ó: 'o',
     ỏ: 'o',
+    ớ: 'o',
     ở: 'o',
     õ: 'o',
+    ợ: 'o',
     ọ: 'o',
     Ò: 'O',
     Ó: 'O',
+    Ờ: 'O',
     Ỏ: 'O',
     Ở: 'O',
+    Ớ: 'O',
     Õ: 'O',
     Ọ: 'O',
+    Ổ: 'O',
+    Ợ: 'O',
     ù: 'u',
     ú: 'u',
     ủ: 'u',
     ũ: 'u',
     ụ: 'u',
     ư: 'u',
+    ự: 'u',
+    ừ: 'u',
+    ứ: 'u',
     Ù: 'U',
     Ú: 'U',
     Ủ: 'U',
     Ũ: 'U',
     Ư: 'U',
+    Ứ: 'U',
     Ụ: 'U',
+    Ừ: 'U',
+    Ự: 'U',
     ỳ: 'y',
     ý: 'y',
     ỷ: 'y',
@@ -77,7 +115,7 @@ function convertVietnameseToNormal(text: string) {
 
   // Use a regular expression to match diacritics and replace them with their non-diacritical counterparts
   return text.replace(
-    /[àáảãạÀÁẢÃẠèéẻẽẹÈÉẺẼẸìíỉĩịÌÍỈĨỊòóỏõọÒÓỎÕỌùúủũụÙÚỦŨỤỳýỷỹỵỲÝỶỸỴđĐ]/g,
+    /[àáảãạăắâấẩấậầặằẳÀÁẢÃẠĂẰẶẮẬẤẦẨẮèéẻẽêếểệÈÉẺẼÊẾỂẸỆìíỉĩịÌÍỈĨỊòóỏõọợớổởờÒÓỎÕỢỜỌỞỔỚùúủũụưựừứeÙÚỦŨỤƯỨỰỪỳýỷỹỵỲÝỶỸỴđĐ]/g,
     (match: string) => diacriticsMap[match as keyof typeof diacriticsMap] || match
   )
 }
@@ -99,6 +137,17 @@ function removeAds() {
     handleRemoveAds()
   }, 3000)
 }
+// re-display bookmarks when can't not skip force ads in the beginning
+function reDisplayBookmarks() {
+  setTimeout(() => {
+    addBookmarksOnTimeLine()
+    setTimeout(() => {
+      addBookmarksOnTimeLine()
+    }, 2000)
+  }, 6500)
+}
+
+reDisplayBookmarks()
 removeAds()
 
 function convertDurationToTimeStamp(durationString: string) {
@@ -492,11 +541,6 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       updateNote(message.vid, message.time, message.desc)
       return
     }
-
-    if (message.type == 'OPEN_NEW_TAB') {
-      window.open(message.url, '_blank')
-      return true
-    }
     if (message.type == 'TAB_UPDATE') {
       addBookmarksOnTimeLine()
       return true
@@ -505,8 +549,6 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       removeOverlay() // remove over layer if it existed
       if (getCurrentVid() == message.vid) {
         playAtTine(message.time)
-      } else {
-        chrome.runtime.sendMessage(message)
       }
     }
   })

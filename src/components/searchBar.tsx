@@ -33,7 +33,17 @@ export default function SearchBar({ data, setData }: Props) {
     if (!search) {
       setData(data)
     }
-    setData((items) => items.filter((val) => val.search.includes(search)))
+    try {
+      const filter = data.filter((val) => {
+        if (val.search) {
+          return val.search.toLowerCase().includes(search.toLowerCase())
+        }
+        return false
+      })
+      setData(filter)
+    } catch (err) {
+      console.log(err)
+    }
   }, [throttledValue])
 
   const handleOnChange = (value: string) => {

@@ -133,7 +133,9 @@ function App() {
               : 'relative left-1/2 top-1/2 transition-all ease-in-out rotate-0 translate-y-[-50%] translate-x-[-50%]'
           }
         >
-          <div className={data.length > 0 ? 'flex items-center justify-center' : 'flex items-center justify-start'}>
+          <div
+            className={data.length > 0 ? 'flex items-center justify-center mt-1' : 'flex items-center justify-start'}
+          >
             <svg
               className={data.length > 0 ? 'w-[160px] fill-white' : 'w-[200px] fill-white'}
               xmlns='http://www.w3.org/2000/svg'
