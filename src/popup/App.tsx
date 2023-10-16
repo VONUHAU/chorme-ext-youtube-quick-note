@@ -33,10 +33,13 @@ function App() {
         }
       }
       const bookmarks: Item[] = Object.values(obj)
+      // sort descendent by createdAt
+      bookmarks.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
       if (currentItem) {
         currentItem.isExpand = true
         bookmarks.unshift(currentItem)
       }
+
       setData(bookmarks)
     }
     initData()
@@ -233,6 +236,7 @@ function App() {
               setData={setData}
               ref={(el) => (carRef.current[key] = el)}
               handleToggle={() => handleToggleAccordion(key)}
+              setMessage={setToast}
             />
           ))}
         </section>

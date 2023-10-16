@@ -12,7 +12,7 @@ export default function Toast({ message, setMessage }: Props) {
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       setMessage('')
-    }, 3000)
+    }, 2900)
     return () => clearTimeout(timeoutRef.current)
   }, [message, setMessage])
 
@@ -22,7 +22,7 @@ export default function Toast({ message, setMessage }: Props) {
   }
   return (
     <div ref={ref} className={`toast-wrapper hidden ${message ? 'show' : ''}`} onClick={handleClick}>
-      <div className='toast fixed left-1/2 -translate-x-1/2 z-50 top-[10px] bg-error rounded text-background w-10/12 p-1.5 font-sans text-sm'>
+      <div className='toast text-center fixed left-1/2 -translate-x-1/2 z-50 top-[10px] bg-error rounded text-background w-10/12 p-1.5 font-sans text-sm'>
         {message}
       </div>
       {/* <div className='toast-overlay fixed top-0 left-0 w-full h-full bg-background opacity-70'></div> */}

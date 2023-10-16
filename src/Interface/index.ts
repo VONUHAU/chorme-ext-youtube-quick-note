@@ -12,7 +12,7 @@ export type Item = {
   ]
   url?: string
   search: string
-  createdAt?: string
+  createdAt: string
   isExpand?: boolean
   newCreated?: boolean
 }

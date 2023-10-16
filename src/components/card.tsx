@@ -7,10 +7,11 @@ export type HTMLMouseEvent = React.MouseEvent<HTMLElement>
 interface Card extends Item {
   setData: Dispatch<SetStateAction<any[]>>
   handleToggle: () => void
+  setMessage: Dispatch<SetStateAction<string>>
 }
 type Ref = HTMLDivElement
 export const Card = forwardRef<Ref, Card>(
-  ({ title, notes, url, vid, isExpand, newCreated, setData, handleToggle }, ref) => {
+  ({ title, notes, url, vid, isExpand, newCreated, setData, handleToggle, setMessage }, ref) => {
     const [accordion, setAccordion] = useState(false)
 
     useEffect(() => {
@@ -64,6 +65,7 @@ export const Card = forwardRef<Ref, Card>(
               notes={notes}
               newCreated={newCreated}
               setData={setData}
+              setMessage={setMessage}
             />
           ))}
         </div>

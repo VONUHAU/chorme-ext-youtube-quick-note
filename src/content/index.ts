@@ -143,7 +143,10 @@ function reDisplayBookmarks() {
     addBookmarksOnTimeLine()
     setTimeout(() => {
       addBookmarksOnTimeLine()
-    }, 2000)
+      setTimeout(() => {
+        addBookmarksOnTimeLine()
+      }, 3000)
+    }, 3000)
   }, 6500)
 }
 
@@ -387,6 +390,21 @@ function addOverLayer() {
   document.body.appendChild(captureArea)
 }
 
+function togglePlayVideo() {
+  const href = window.location.href
+  if (!href.includes('youtube.com/watch')) {
+    return
+  }
+  const video = document.querySelector('video')
+  if (video && video.paused) {
+    video.play()
+    return
+  }
+  if (video && video.played) {
+    video.pause()
+    return
+  }
+}
 async function handleScreenShot(tab: any, isExtract?: boolean) {
   if (!tab.url.includes('youtube.com/watch')) {
     console.log('Not a youtube watch page')
@@ -497,9 +515,14 @@ const handleAddBookmark = async (newBookmark: Item): Promise<BookmarkProp> => {
   })
 }
 
-const playAtTine = (time: number) => {
+const playAtTime = (time: number, delta?: number, type?: string) => {
+  if (!delta) delta = 0
   const youtubePlayer: HTMLVideoElement | null = document.querySelector('.video-stream')
-  youtubePlayer.currentTime = time
+  if (type == 'SKIP') {
+    time = youtubePlayer.currentTime
+    console.log(time)
+  }
+  youtubePlayer.currentTime = time + delta
 }
 
 const handleResponse = async (sendResponse: (response: any) => void, tab: any, isExtract: boolean = false) => {
@@ -545,11 +568,21 @@ const handleResponse = async (sendResponse: (response: any) => void, tab: any, i
       addBookmarksOnTimeLine()
       return true
     }
-    if (message.type == 'PLAY') {
-      removeOverlay() // remove over layer if it existed
+    if (message.type == 'PLAY_AT_TIME') {
       if (getCurrentVid() == message.vid) {
-        playAtTine(message.time)
+        playAtTime(message.time)
+        return true
       }
+    }
+    if (message.type == 'SKIP_TIMESTAMP') {
+      if (getCurrentVid() == message.vid) {
+        playAtTime(0, message.value, 'SKIP')
+        return true
+      }
+    }
+    if (message.type == 'TOGGLE_PLAY') {
+      togglePlayVideo()
+      return true
     }
   })
 })()

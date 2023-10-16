@@ -27,7 +27,6 @@
     "<all_urls>"
   ],
   "permissions": [
-    "scripting",
     "tabs",
     "storage"
   ],
